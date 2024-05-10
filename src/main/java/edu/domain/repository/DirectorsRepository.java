@@ -13,8 +13,8 @@ import java.util.Optional;
 
 public class DirectorsRepository {
     private static final String TABLE_NAME = "directors";
-    private static final String FIND_ALL_TEMPLATE = "SELECT * FROM " + TABLE_NAME;// TODO: развернуть * в названия полей
-    private static final String FIND_BY_ID_TEMPLATE = "SELECT * FROM " + TABLE_NAME + " WHERE id = ?";
+    private static final String FIND_ALL_TEMPLATE = "SELECT id, name FROM " + TABLE_NAME;
+    private static final String FIND_BY_ID_TEMPLATE = "SELECT id, name FROM " + TABLE_NAME + " WHERE id = ?";
     private static final String SAVE_TEMPLATE = "INSERT INTO " + TABLE_NAME + "(name) VALUES (?)";
     private static final String UPDATE_TEMPLATE = "UPDATE " + TABLE_NAME + " SET name = ? WHERE id = ?";
     private static final String DELETE_TEMPLATE = "DELETE FROM " + TABLE_NAME + " WHERE id = ?";
