@@ -1,6 +1,7 @@
 package edu.domain.repository;
 
 import edu.domain.model.Director;
+import edu.domain.repository.mapper.DirectorMapper;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.Connection;
@@ -20,6 +21,7 @@ public class DirectorsRepository {
     private static final String DELETE_TEMPLATE = "DELETE FROM " + TABLE_NAME + " WHERE id = ?";
 
     private Connection connection;
+    private final DirectorMapper directorMapper;
 
     public List<Director> findAll() {
         List<Director> directors = new ArrayList<>();
@@ -29,11 +31,7 @@ public class DirectorsRepository {
             ResultSet resultSet = preparedStatement.executeQuery();
 
             while (resultSet.next()) {
-                Director director = new Director(
-                        resultSet.getInt("id"),
-                        resultSet.getString("name")
-                );
-
+                Director director = directorMapper.mapRow(resultSet);
                 directors.add(director);
             }
         } catch (SQLException e) {
@@ -53,10 +51,7 @@ public class DirectorsRepository {
             ResultSet resultSet = preparedStatement.executeQuery();
 
             if (resultSet.next()) {
-                Director director = new Director(
-                        resultSet.getInt("id"),
-                        resultSet.getString("name")
-                );
+                Director director = directorMapper.mapRow(resultSet);
                 result = Optional.of(director);
             }
         } catch (SQLException e) {

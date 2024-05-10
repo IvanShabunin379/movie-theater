@@ -1,6 +1,7 @@
 package edu.domain.repository;
 
 import edu.domain.model.Country;
+import edu.domain.repository.mapper.CountryMapper;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.Connection;
@@ -20,6 +21,7 @@ public class CountiesRepository {
     private static final String DELETE_TEMPLATE = "DELETE FROM " + TABLE_NAME + " WHERE id = ?";
 
     private Connection connection;
+    private final CountryMapper countryMapper;
 
     public List<Country> findAll() {
         List<Country> countries = new ArrayList<>();
@@ -29,11 +31,7 @@ public class CountiesRepository {
             ResultSet resultSet = preparedStatement.executeQuery();
 
             while (resultSet.next()) {
-                Country country = new Country(
-                        resultSet.getInt("id"),
-                        resultSet.getString("name")
-                );
-
+                Country country = countryMapper.mapRow(resultSet);
                 countries.add(country);
             }
         } catch (SQLException e) {
@@ -53,10 +51,7 @@ public class CountiesRepository {
             ResultSet resultSet = preparedStatement.executeQuery();
 
             if (resultSet.next()) {
-                Country country = new Country(
-                        resultSet.getInt("id"),
-                        resultSet.getString("name")
-                );
+                Country country = countryMapper.mapRow(resultSet);
                 result = Optional.of(country);
             }
         } catch (SQLException e) {
