@@ -1,7 +1,9 @@
 package edu.domain.repository;
 
 import edu.domain.model.Director;
+import edu.domain.repository.exception.DataAccessException;
 import edu.domain.repository.mapper.DirectorMapper;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.Connection;
@@ -12,13 +14,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@RequiredArgsConstructor
 public class DirectorsRepository {
-    private static final String TABLE_NAME = "directors";
-    private static final String FIND_ALL_TEMPLATE = "SELECT id, name FROM " + TABLE_NAME;
-    private static final String FIND_BY_ID_TEMPLATE = "SELECT id, name FROM " + TABLE_NAME + " WHERE id = ?";
-    private static final String SAVE_TEMPLATE = "INSERT INTO " + TABLE_NAME + "(name) VALUES (?)";
-    private static final String UPDATE_TEMPLATE = "UPDATE " + TABLE_NAME + " SET name = ? WHERE id = ?";
-    private static final String DELETE_TEMPLATE = "DELETE FROM " + TABLE_NAME + " WHERE id = ?";
+    private static final String FIND_ALL_TEMPLATE = "SELECT id, name FROM directors";
+    private static final String FIND_BY_ID_TEMPLATE = "SELECT id, name FROM directors WHERE id = ?";
+    private static final String SAVE_TEMPLATE = "INSERT INTO directors(name) VALUES (?)";
+    private static final String UPDATE_TEMPLATE = "UPDATE directors SET name = ? WHERE id = ?";
+    private static final String DELETE_TEMPLATE = "DELETE FROM directors WHERE id = ?";
 
     private Connection connection;
     private final DirectorMapper directorMapper;
@@ -35,7 +37,7 @@ public class DirectorsRepository {
                 directors.add(director);
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new DataAccessException(e);
         }
 
         return directors;
@@ -55,20 +57,24 @@ public class DirectorsRepository {
                 result = Optional.of(director);
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new DataAccessException(e);
         }
 
         return result;
     }
 
-    public void save(@NotNull Director director) {
+    public boolean save(@NotNull Director director) {
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(SAVE_TEMPLATE);
-            preparedStatement.setString(1, director.name());
+            preparedStatement.setString(1, director.getName());
 
-            preparedStatement.executeUpdate();
+            return preparedStatement.executeUpdate() == 1;
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            if (e.getSQLState().equals("23000")) {
+                return false;
+            } else {
+                throw new DataAccessException(e);
+            }
         }
     }
 
@@ -76,12 +82,12 @@ public class DirectorsRepository {
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_TEMPLATE);
 
-            preparedStatement.setString(1, updatedDirector.name());
+            preparedStatement.setString(1, updatedDirector.getName());
             preparedStatement.setInt(2, id);
 
             return preparedStatement.executeUpdate() == 1;
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new DataAccessException(e);
         }
     }
 
@@ -92,7 +98,7 @@ public class DirectorsRepository {
 
             return preparedStatement.executeUpdate() == 1;
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new DataAccessException(e);
         }
     }
 }
