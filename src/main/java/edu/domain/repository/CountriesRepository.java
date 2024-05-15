@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-@Slf4j
 @RequiredArgsConstructor
 public class CountriesRepository {
     private static final String FIND_ALL_TEMPLATE = "SELECT id, name FROM countries";

@@ -69,7 +69,7 @@ public class AuditoriumsRepository {
         return auditoriums;
     }
 
-    public Optional<Auditorium> findById(int id) throws SQLException {
+    public Optional<Auditorium> findById(int id) {
         Optional<Auditorium> result = Optional.empty();
 
         try {

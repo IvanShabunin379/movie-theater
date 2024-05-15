@@ -4,7 +4,6 @@ import edu.domain.model.User;
 import edu.domain.repository.exception.DataAccessException;
 import edu.domain.repository.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.Connection;
