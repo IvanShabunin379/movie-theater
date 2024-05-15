@@ -1,6 +1,17 @@
 package edu.domain.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.time.OffsetDateTime;
 
-public record Session(int id, int movieId, int auditoriumId, OffsetDateTime startTime) {
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class Session {
+    private Integer id;
+    private Integer movieId;
+    private Integer auditoriumId;
+    private OffsetDateTime startTime;
 }

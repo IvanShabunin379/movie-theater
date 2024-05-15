@@ -1,4 +1,16 @@
 package edu.domain.model;
 
-public record Auditorium(int id, int numberOfRows, int numberOfSeats, boolean is3d, boolean isVip) {
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class Auditorium {
+    private Integer id;
+    private Integer numberOfRows;
+    private Integer numberOfSeatsInRow;
+    private Boolean is3d;
+    private Boolean isVip;
 }
