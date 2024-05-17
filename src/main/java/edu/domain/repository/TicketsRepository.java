@@ -1,9 +1,9 @@
 package edu.domain.repository;
 
+import edu.database.ConnectionFactory;
 import edu.domain.model.Ticket;
 import edu.domain.repository.exception.DataAccessException;
 import edu.domain.repository.mapper.TicketMapper;
-import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.Connection;
@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-@RequiredArgsConstructor
 public class TicketsRepository {
     private static final String FIND_ALL_TEMPLATE = """
             SELECT id,
@@ -28,7 +27,7 @@ public class TicketsRepository {
                    visitor_id
             FROM tickets
             """;
-    private static final String FIND_BY_SESSION = """
+    private static final String FIND_BY_SESSION_TEMPLATE = """
             SELECT id,
                    session_id,
                    row,
@@ -40,7 +39,7 @@ public class TicketsRepository {
             FROM tickets
             WHERE session_id = ?
             """;
-    private static final String FIND_ALL_PURCHASED = """
+    private static final String FIND_ALL_PURCHASED_TEMPLATE = """
             SELECT id,
                    session_id,
                    row,
@@ -52,7 +51,7 @@ public class TicketsRepository {
             FROM tickets
             WHERE is_purchased = true
             """;
-    private static final String FIND_ALL_UNPURCHASED = """
+    private static final String FIND_ALL_UNPURCHASED_TEMPLATE = """
             SELECT id,
                    session_id,
                    row,
@@ -64,7 +63,7 @@ public class TicketsRepository {
             FROM tickets
             WHERE is_purchased = false
             """;
-    private static final String FIND_BY_VISITOR = """
+    private static final String FIND_BY_VISITOR_TEMPLATE = """
             SELECT id,
                    session_id,
                    row,
@@ -125,8 +124,13 @@ public class TicketsRepository {
             """;
     private static final String DELETE_TEMPLATE = "DELETE FROM tickets WHERE id = ?";
 
-    private Connection connection;
+    private final Connection connection;
     private final TicketMapper ticketMapper;
+
+    public TicketsRepository() {
+        connection = ConnectionFactory.getConnection();
+        ticketMapper = new TicketMapper();
+    }
 
     public List<Ticket> findAll() {
         List<Ticket> tickets = new ArrayList<>();
@@ -150,7 +154,7 @@ public class TicketsRepository {
         List<Ticket> tickets = new ArrayList<>();
 
         try {
-            PreparedStatement preparedStatement = connection.prepareStatement(FIND_BY_SESSION);
+            PreparedStatement preparedStatement = connection.prepareStatement(FIND_BY_SESSION_TEMPLATE);
             preparedStatement.setInt(1, sessionId);
 
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -170,7 +174,7 @@ public class TicketsRepository {
         List<Ticket> tickets = new ArrayList<>();
 
         try {
-            PreparedStatement preparedStatement = connection.prepareStatement(FIND_ALL_PURCHASED);
+            PreparedStatement preparedStatement = connection.prepareStatement(FIND_ALL_PURCHASED_TEMPLATE);
             ResultSet resultSet = preparedStatement.executeQuery();
 
             while (resultSet.next()) {
@@ -188,7 +192,7 @@ public class TicketsRepository {
         List<Ticket> tickets = new ArrayList<>();
 
         try {
-            PreparedStatement preparedStatement = connection.prepareStatement(FIND_ALL_UNPURCHASED);
+            PreparedStatement preparedStatement = connection.prepareStatement(FIND_ALL_UNPURCHASED_TEMPLATE);
             ResultSet resultSet = preparedStatement.executeQuery();
 
             while (resultSet.next()) {
@@ -206,7 +210,7 @@ public class TicketsRepository {
         List<Ticket> tickets = new ArrayList<>();
 
         try {
-            PreparedStatement preparedStatement = connection.prepareStatement(FIND_BY_VISITOR);
+            PreparedStatement preparedStatement = connection.prepareStatement(FIND_BY_VISITOR_TEMPLATE);
             preparedStatement.setInt(1, userId);
 
             ResultSet resultSet = preparedStatement.executeQuery();
