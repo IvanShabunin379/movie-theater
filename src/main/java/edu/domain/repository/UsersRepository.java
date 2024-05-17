@@ -1,9 +1,9 @@
 package edu.domain.repository;
 
+import edu.database.ConnectionFactory;
 import edu.domain.model.User;
 import edu.domain.repository.exception.DataAccessException;
 import edu.domain.repository.mapper.UserMapper;
-import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.Connection;
@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-@RequiredArgsConstructor
 public class UsersRepository {
     private static final String FIND_ALL_TEMPLATE = "SELECT id, name, email, password_hash FROM users";
     private static final String FIND_BY_ID_TEMPLATE = "SELECT id, name, email, password_hash FROM users WHERE id = ?";
@@ -33,8 +32,13 @@ public class UsersRepository {
             """;
     private static final String DELETE_TEMPLATE = "DELETE FROM users WHERE id = ?";
 
-    private Connection connection;
+    private final Connection connection;
     private final UserMapper userMapper;
+
+    public UsersRepository() {
+        connection = ConnectionFactory.getConnection();
+        userMapper = new UserMapper();
+    }
 
     public List<User> findAll() {
         List<User> users = new ArrayList<>();
