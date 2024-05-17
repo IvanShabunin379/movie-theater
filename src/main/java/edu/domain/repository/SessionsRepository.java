@@ -1,10 +1,9 @@
 package edu.domain.repository;
 
-import edu.domain.model.Movie;
+import edu.database.ConnectionFactory;
 import edu.domain.model.Session;
 import edu.domain.repository.exception.DataAccessException;
 import edu.domain.repository.mapper.SessionMapper;
-import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.Connection;
@@ -17,7 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-@RequiredArgsConstructor
 public class SessionsRepository {
     private static final String FIND_ALL_TEMPLATE = "SELECT id, movie_id, auditorium_id, start_time FROM sessions";
     private static final String FIND_BY_ID_TEMPLATE = "SELECT id, movie_id, auditorium_id, start_time FROM sessions WHERE id = ?";
@@ -29,13 +27,30 @@ public class SessionsRepository {
             FROM sessions
             WHERE movie_id = ?
             """;
-    private static final String FIND_BY_DAY = """
+    private static final String FIND_BY_DATE_TEMPLATE = """
             SELECT id,
                    movie_id,
                    auditorium_id,
-                   start_time 
+                   start_time
             FROM sessions
             WHERE DATE_TRUNC('day', start_time) = ?
+            """;
+    private static final String FIND_BY_MOVIE_BETWEEN_TIMESTAMPS_TEMPLATE = """
+            SELECT id,
+                   movie_id,
+                   auditorium_id,
+                   start_time
+            FROM sessions
+            WHERE movie_id = ? 
+                AND start_time BETWEEN ? AND ?;
+            """;
+    private static final String FIND_BETWEEN_TIMESTAMPS_TEMPLATE = """
+            SELECT id,
+                    movie_id,
+                    auditorium_id,
+                    start_time
+             FROM sessions
+             WHERE start_time BETWEEN ? AND ?
             """;
     private static final String SAVE_TEMPLATE = "INSERT INTO sessions(movie_id, auditorium_id, start_time) VALUES (?, ?, ?)";
     private static final String UPDATE_TEMPLATE = """
@@ -48,8 +63,13 @@ public class SessionsRepository {
     private static final String DELETE_TEMPLATE = "DELETE FROM sessions WHERE id = ?";
 
 
-    private Connection connection;
+    private final Connection connection;
     private final SessionMapper sessionMapper;
+
+    public SessionsRepository() {
+        connection = ConnectionFactory.getConnection();
+        sessionMapper = new SessionMapper();
+    }
 
     public List<Session> findAll() {
         List<Session> sessions = new ArrayList<>();
@@ -89,16 +109,67 @@ public class SessionsRepository {
         return sessions;
     }
 
-    public List<Session> findByDay(OffsetDateTime day) {
+    public List<Session> findByDate(OffsetDateTime date) {
+        List<Session> sessions = new ArrayList<>();
 
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(FIND_BY_DATE_TEMPLATE);
+            preparedStatement.setTimestamp(1, Timestamp.from(date.toInstant()));
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                Session session = sessionMapper.mapRow(resultSet);
+                sessions.add(session);
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(e);
+        }
+
+        return sessions;
     }
 
     public List<Session> findBetweenTimestamps(OffsetDateTime after, OffsetDateTime before) {
+        List<Session> sessions = new ArrayList<>();
 
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(FIND_BETWEEN_TIMESTAMPS_TEMPLATE);
+            preparedStatement.setTimestamp(1, Timestamp.from(after.toInstant()));
+            preparedStatement.setTimestamp(2, Timestamp.from(before.toInstant()));
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                Session session = sessionMapper.mapRow(resultSet);
+                sessions.add(session);
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(e);
+        }
+
+        return sessions;
     }
 
-    public List<Session> findByMovieBetweenTimestamp(int movieId, OffsetDateTime after, OffsetDateTime before) {
+    public List<Session> findByMovieBetweenTimestamps(int movieId, OffsetDateTime after, OffsetDateTime before) {
+        List<Session> sessions = new ArrayList<>();
 
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(FIND_BY_MOVIE_BETWEEN_TIMESTAMPS_TEMPLATE);
+            preparedStatement.setInt(1, movieId);
+            preparedStatement.setTimestamp(2, Timestamp.from(after.toInstant()));
+            preparedStatement.setTimestamp(3, Timestamp.from(before.toInstant()));
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                Session session = sessionMapper.mapRow(resultSet);
+                sessions.add(session);
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(e);
+        }
+
+        return sessions;
     }
 
     public Optional<Session> findById(int id) {

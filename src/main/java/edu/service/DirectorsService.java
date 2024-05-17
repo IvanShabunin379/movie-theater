@@ -5,6 +5,7 @@ import edu.domain.model.Movie;
 import edu.domain.repository.DirectorsRepository;
 import edu.domain.repository.MoviesRepository;
 import edu.service.exception.director.DirectorAlreadyExistsException;
+import edu.service.exception.director.DirectorNotFoundException;
 import edu.service.exception.movie.MovieNotFoundException;
 import lombok.RequiredArgsConstructor;
 
@@ -24,7 +25,7 @@ public class DirectorsService {
 
     public void remove(int id) {
         if (!directorsRepository.delete(id)) {
-            throw new DirectorAlreadyExistsException();
+            throw new DirectorNotFoundException();
         }
     }
 

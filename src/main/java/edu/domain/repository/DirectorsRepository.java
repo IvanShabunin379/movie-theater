@@ -1,9 +1,9 @@
 package edu.domain.repository;
 
+import edu.database.ConnectionFactory;
 import edu.domain.model.Director;
 import edu.domain.repository.exception.DataAccessException;
 import edu.domain.repository.mapper.DirectorMapper;
-import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.Connection;
@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-@RequiredArgsConstructor
 public class DirectorsRepository {
     private static final String FIND_ALL_TEMPLATE = "SELECT id, name FROM directors";
     private static final String FIND_BY_ID_TEMPLATE = "SELECT id, name FROM directors WHERE id = ?";
@@ -22,8 +21,13 @@ public class DirectorsRepository {
     private static final String UPDATE_TEMPLATE = "UPDATE directors SET name = ? WHERE id = ?";
     private static final String DELETE_TEMPLATE = "DELETE FROM directors WHERE id = ?";
 
-    private Connection connection;
+    private final Connection connection;
     private final DirectorMapper directorMapper;
+
+    public DirectorsRepository() {
+        connection = ConnectionFactory.getConnection();
+        directorMapper = new DirectorMapper();
+    }
 
     public List<Director> findAll() {
         List<Director> directors = new ArrayList<>();
