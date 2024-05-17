@@ -1,9 +1,9 @@
 package edu.domain.repository;
 
+import edu.database.ConnectionFactory;
 import edu.domain.model.Movie;
 import edu.domain.repository.exception.DataAccessException;
 import edu.domain.repository.mapper.MovieMapper;
-import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.Connection;
@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-@RequiredArgsConstructor
 public class MoviesRepository {
     private static final String FIND_ALL_TEMPLATE = """
             SELECT id,
@@ -29,7 +28,7 @@ public class MoviesRepository {
                    is_currently_at_box_office
             FROM movies
             """;
-    private static final String FIND_ALL_ARE_CURRENTLY_AT_BOX_OFFICE = """
+    private static final String FIND_ALL_ARE_CURRENTLY_AT_BOX_OFFICE_TEMPLATE = """
             SELECT id,
                    name,
                    year,
@@ -84,8 +83,13 @@ public class MoviesRepository {
             """;
     private static final String DELETE_TEMPLATE = "DELETE FROM movies WHERE id = ?";
 
-    private Connection connection;
+    private final Connection connection;
     private final MovieMapper movieMapper;
+
+    public MoviesRepository() {
+        connection = ConnectionFactory.getConnection();
+        movieMapper = new MovieMapper();
+    }
 
     public List<Movie> findAll() {
         List<Movie> movies = new ArrayList<>();
@@ -109,7 +113,7 @@ public class MoviesRepository {
         List<Movie> movies = new ArrayList<>();
 
         try {
-            PreparedStatement preparedStatement = connection.prepareStatement(FIND_ALL_ARE_CURRENTLY_AT_BOX_OFFICE);
+            PreparedStatement preparedStatement = connection.prepareStatement(FIND_ALL_ARE_CURRENTLY_AT_BOX_OFFICE_TEMPLATE);
             ResultSet resultSet = preparedStatement.executeQuery();
 
             while (resultSet.next()) {
