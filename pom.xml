@@ -60,7 +60,6 @@
             <version>6.0.0</version>
             <scope>provided</scope>
         </dependency>
-
     </dependencies>
 
     <build>
@@ -89,4 +88,5 @@
             </plugins>
         </pluginManagement>
     </build>
+    </dependencies>
 </project>
