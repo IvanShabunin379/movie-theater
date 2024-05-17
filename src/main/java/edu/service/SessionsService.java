@@ -35,6 +35,6 @@ public class SessionsService {
     }
 
     public List<Session> listAllMovieSessionsForTimePeriod(int movieId, OffsetDateTime periodStart, OffsetDateTime periodEnd) {
-        return sessionsRepository.findByMovieBetweenTimestamp(movieId, periodStart, periodEnd);
+        return sessionsRepository.findByMovieBetweenTimestamps(movieId, periodStart, periodEnd);
     }
 }
