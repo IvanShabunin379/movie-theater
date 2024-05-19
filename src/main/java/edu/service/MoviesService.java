@@ -29,6 +29,10 @@ public class MoviesService {
                     boolean isCurrentlyAtBoxOffice) {
         validateMovieAttributes(year, duration);
 
+        if (name == null) {
+            throw new IllegalArgumentException("Movie name should be not null.");
+        }
+
         Movie movie = new Movie();
         movie.setName(name);
         movie.setYear(year);
