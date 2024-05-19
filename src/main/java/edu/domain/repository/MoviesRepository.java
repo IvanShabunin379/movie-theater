@@ -24,7 +24,7 @@ public class MoviesRepository {
                    genre,
                    duration,
                    description,
-                   movie_id,
+                   director_id,
                    is_currently_at_box_office
             FROM movies
             """;
@@ -37,7 +37,7 @@ public class MoviesRepository {
                    genre,
                    duration,
                    description,
-                   movie_id,
+                   director_id,
                    is_currently_at_box_office
             FROM movies
             WHERE is_currently_at_box_office = true     
@@ -51,10 +51,24 @@ public class MoviesRepository {
                    genre,
                    duration,
                    description,
-                   movie_id,
+                   director_id,
                    is_currently_at_box_office
             FROM movies
             WHERE id = ?
+            """;
+    private static final String FIND_BY_NAME_AND_DIRECTOR_AND_YEAR_TEMPLATE = """
+            SELECT id,
+                   name,
+                   year,
+                   country_id,
+                   poster_path,
+                   genre,
+                   duration,
+                   description,
+                   director_id,
+                   is_currently_at_box_office
+            FROM movies
+            WHERE name = ? AND director_id = ? AND year = ?
             """;
     private static final String SAVE_TEMPLATE = """
             INSERT INTO movies(name,
@@ -64,7 +78,7 @@ public class MoviesRepository {
                                genre,
                                duration,
                                description,
-                               movie_id,
+                               director_id,
                                is_currently_at_box_office)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             """;
@@ -77,7 +91,7 @@ public class MoviesRepository {
                 genre = ?,
                 duration = ?,
                 description = ?,
-                movie_id = ?,
+                director_id = ?,
                 is_currently_at_box_office = ?
             WHERE id = ?
             """;
@@ -133,6 +147,28 @@ public class MoviesRepository {
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(FIND_BY_ID_TEMPLATE);
             preparedStatement.setInt(1, id);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                Movie movie = movieMapper.mapRow(resultSet);
+                result = Optional.of(movie);
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(e);
+        }
+
+        return result;
+    }
+
+    public Optional<Movie> findByNameAndDirectorAndYear(String name, int directorId, int year) {
+        Optional<Movie> result = Optional.empty();
+
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(FIND_BY_NAME_AND_DIRECTOR_AND_YEAR_TEMPLATE);
+            preparedStatement.setString(1, name);
+            preparedStatement.setInt(2, directorId);
+            preparedStatement.setInt(3, year);
 
             ResultSet resultSet = preparedStatement.executeQuery();
 
