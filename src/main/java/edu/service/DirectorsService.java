@@ -15,6 +15,10 @@ public class DirectorsService {
     private final MoviesRepository moviesRepository;
 
     public void add(String name) {
+        if (name == null || name.isEmpty()) {
+            throw new IllegalArgumentException("Director name should be not null and not empty.");
+        }
+
         Director director = new Director();
         director.setName(name);
 

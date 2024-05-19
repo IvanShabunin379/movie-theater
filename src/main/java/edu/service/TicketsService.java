@@ -120,6 +120,10 @@ public class TicketsService {
     }
 
     private void validateTicketPrice(BigDecimal price) {
+        if (price == null) {
+            throw new IllegalArgumentException("Ticket price should be not null.");
+        }
+
         if (price.compareTo(BigDecimal.valueOf(MIN_PRICE)) < 0 || price.compareTo(BigDecimal.valueOf(MAX_PRICE)) > 0) {
             throw new IllegalArgumentException("Ticket price should be between " + MIN_PRICE + " and " + MAX_PRICE + ".");
         }
