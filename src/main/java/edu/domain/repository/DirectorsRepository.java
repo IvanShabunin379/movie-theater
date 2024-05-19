@@ -17,6 +17,7 @@ import java.util.Optional;
 public class DirectorsRepository {
     private static final String FIND_ALL_TEMPLATE = "SELECT id, name FROM directors";
     private static final String FIND_BY_ID_TEMPLATE = "SELECT id, name FROM directors WHERE id = ?";
+    private static final String FIND_BY_NAME_TEMPLATE = "SELECT id, name FROM directors WHERE name = ?";
     private static final String SAVE_TEMPLATE = "INSERT INTO directors(name) VALUES (?)";
     private static final String UPDATE_TEMPLATE = "UPDATE directors SET name = ? WHERE id = ?";
     private static final String DELETE_TEMPLATE = "DELETE FROM directors WHERE id = ?";
@@ -53,6 +54,26 @@ public class DirectorsRepository {
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(FIND_BY_ID_TEMPLATE);
             preparedStatement.setInt(1, id);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                Director director = directorMapper.mapRow(resultSet);
+                result = Optional.of(director);
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(e);
+        }
+
+        return result;
+    }
+
+    public Optional<Director> findByName(String name) {
+        Optional<Director> result = Optional.empty();
+
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(FIND_BY_NAME_TEMPLATE);
+            preparedStatement.setString(1, name);
 
             ResultSet resultSet = preparedStatement.executeQuery();
 

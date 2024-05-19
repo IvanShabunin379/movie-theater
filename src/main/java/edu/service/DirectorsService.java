@@ -29,7 +29,7 @@ public class DirectorsService {
 
     public void remove(int id) {
         if (!directorsRepository.delete(id)) {
-            throw new DirectorNotFoundException();
+            throw new DirectorAlreadyExistsException();
         }
     }
 
@@ -38,5 +38,10 @@ public class DirectorsService {
                 .orElseThrow(MovieNotFoundException::new);
 
         return directorsRepository.findById(movie.getDirectorId()).get();
+    }
+
+    public Director getByName(String name) {
+        return directorsRepository.findByName(name)
+                .orElseThrow(DirectorNotFoundException::new);
     }
 }
