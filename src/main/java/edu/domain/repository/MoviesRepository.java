@@ -24,7 +24,7 @@ public class MoviesRepository {
                    genre,
                    duration,
                    description,
-                   movie_id,
+                   director_id,
                    is_currently_at_box_office
             FROM movies
             """;
@@ -37,7 +37,7 @@ public class MoviesRepository {
                    genre,
                    duration,
                    description,
-                   movie_id,
+                   director_id,
                    is_currently_at_box_office
             FROM movies
             WHERE is_currently_at_box_office = true     
@@ -51,7 +51,7 @@ public class MoviesRepository {
                    genre,
                    duration,
                    description,
-                   movie_id,
+                   director_id,
                    is_currently_at_box_office
             FROM movies
             WHERE id = ?
@@ -64,7 +64,7 @@ public class MoviesRepository {
                                genre,
                                duration,
                                description,
-                               movie_id,
+                               director_id,
                                is_currently_at_box_office)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             """;
@@ -77,7 +77,7 @@ public class MoviesRepository {
                 genre = ?,
                 duration = ?,
                 description = ?,
-                movie_id = ?,
+                director_id = ?,
                 is_currently_at_box_office = ?
             WHERE id = ?
             """;
