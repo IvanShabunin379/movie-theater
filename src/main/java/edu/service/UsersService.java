@@ -18,6 +18,8 @@ public class UsersService {
     private final TicketsRepository ticketsRepository;
 
     public void register(String name, String email, String passwordHash) {
+        validateEmailAndPassword(email, passwordHash);
+
         User user = new User();
         user.setName(name);
         user.setEmail(email);
