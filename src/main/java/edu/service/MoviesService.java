@@ -67,6 +67,11 @@ public class MoviesService {
         moviesRepository.update(id, movieWithUpdatedPoster);
     }
 
+    public Movie getByNameAndDirectorAndYear(String name, int directorId, int year) {
+        return moviesRepository.findByNameAndDirectorAndYear(name, directorId, year)
+                .orElseThrow(MovieNotFoundException::new);
+    }
+
     public void updateDescription(int id, String newDescription) {
         Movie movieWithUpdatedDescription = moviesRepository.findById(id)
                 .orElseThrow(MovieNotFoundException::new);

@@ -5,6 +5,7 @@ import edu.domain.model.Movie;
 import edu.domain.repository.DirectorsRepository;
 import edu.domain.repository.MoviesRepository;
 import edu.service.exception.director.DirectorAlreadyExistsException;
+import edu.service.exception.director.DirectorNotFoundException;
 import edu.service.exception.movie.MovieNotFoundException;
 import lombok.RequiredArgsConstructor;
 
@@ -37,5 +38,10 @@ public class DirectorsService {
                 .orElseThrow(MovieNotFoundException::new);
 
         return directorsRepository.findById(movie.getDirectorId()).get();
+    }
+
+    public Director getByName(String name) {
+        return directorsRepository.findByName(name)
+                .orElseThrow(DirectorNotFoundException::new);
     }
 }
