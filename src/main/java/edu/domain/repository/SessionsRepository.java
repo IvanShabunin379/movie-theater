@@ -23,7 +23,7 @@ public class SessionsRepository {
             SELECT id,
                    movie_id,
                    auditorium_id,
-                   start_time 
+                   start_time
             FROM sessions
             WHERE movie_id = ?
             """;
@@ -41,7 +41,7 @@ public class SessionsRepository {
                    auditorium_id,
                    start_time
             FROM sessions
-            WHERE movie_id = ? 
+            WHERE movie_id = ?
                 AND start_time BETWEEN ? AND ?;
             """;
     private static final String FIND_BETWEEN_TIMESTAMPS_TEMPLATE = """
@@ -63,15 +63,16 @@ public class SessionsRepository {
     private static final String DELETE_TEMPLATE = "DELETE FROM sessions WHERE id = ?";
 
 
-    private final Connection connection;
+    private Connection connection;
     private final SessionMapper sessionMapper;
 
     public SessionsRepository() {
-        connection = ConnectionFactory.getConnection();
         sessionMapper = new SessionMapper();
     }
 
     public List<Session> findAll() {
+        connection = ConnectionFactory.getConnection();
+
         List<Session> sessions = new ArrayList<>();
 
         try {
@@ -90,6 +91,8 @@ public class SessionsRepository {
     }
 
     public List<Session> findByMovie(int movieId) {
+        connection = ConnectionFactory.getConnection();
+
         List<Session> sessions = new ArrayList<>();
 
         try {
@@ -110,6 +113,8 @@ public class SessionsRepository {
     }
 
     public List<Session> findByDate(OffsetDateTime date) {
+        connection = ConnectionFactory.getConnection();
+
         List<Session> sessions = new ArrayList<>();
 
         try {
@@ -130,6 +135,8 @@ public class SessionsRepository {
     }
 
     public List<Session> findBetweenTimestamps(OffsetDateTime after, OffsetDateTime before) {
+        connection = ConnectionFactory.getConnection();
+
         List<Session> sessions = new ArrayList<>();
 
         try {
@@ -151,6 +158,8 @@ public class SessionsRepository {
     }
 
     public List<Session> findByMovieBetweenTimestamps(int movieId, OffsetDateTime after, OffsetDateTime before) {
+        connection = ConnectionFactory.getConnection();
+
         List<Session> sessions = new ArrayList<>();
 
         try {
@@ -173,6 +182,8 @@ public class SessionsRepository {
     }
 
     public Optional<Session> findById(int id) {
+        connection = ConnectionFactory.getConnection();
+
         Optional<Session> result = Optional.empty();
 
         try {
@@ -193,6 +204,8 @@ public class SessionsRepository {
     }
 
     public boolean save(@NotNull Session session) {
+        connection = ConnectionFactory.getConnection();
+
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(SAVE_TEMPLATE);
             preparedStatement.setInt(1, session.getId());
@@ -211,6 +224,8 @@ public class SessionsRepository {
     }
 
     public boolean update(int id, @NotNull Session updatedSession) {
+        connection = ConnectionFactory.getConnection();
+
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_TEMPLATE);
 
@@ -226,6 +241,8 @@ public class SessionsRepository {
     }
 
     public boolean delete(int id) {
+        connection = ConnectionFactory.getConnection();
+
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(DELETE_TEMPLATE);
             preparedStatement.setInt(1, id);

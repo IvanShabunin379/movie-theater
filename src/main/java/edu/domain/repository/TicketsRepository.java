@@ -124,7 +124,7 @@ public class TicketsRepository {
             """;
     private static final String DELETE_TEMPLATE = "DELETE FROM tickets WHERE id = ?";
 
-    private final Connection connection;
+    private Connection connection;
     private final TicketMapper ticketMapper;
 
     public TicketsRepository() {
@@ -133,6 +133,8 @@ public class TicketsRepository {
     }
 
     public List<Ticket> findAll() {
+        connection = ConnectionFactory.getConnection();
+
         List<Ticket> tickets = new ArrayList<>();
 
         try {
@@ -151,6 +153,8 @@ public class TicketsRepository {
     }
 
     public List<Ticket> findBySession(int sessionId) {
+        connection = ConnectionFactory.getConnection();
+
         List<Ticket> tickets = new ArrayList<>();
 
         try {
@@ -171,6 +175,8 @@ public class TicketsRepository {
     }
 
     public List<Ticket> findAllPurchased(int sessionId) {
+        connection = ConnectionFactory.getConnection();
+
         List<Ticket> tickets = new ArrayList<>();
 
         try {
@@ -189,6 +195,8 @@ public class TicketsRepository {
     }
 
     public List<Ticket> findAllUnpurchased(int sessionId) {
+        connection = ConnectionFactory.getConnection();
+
         List<Ticket> tickets = new ArrayList<>();
 
         try {
@@ -207,6 +215,8 @@ public class TicketsRepository {
     }
 
     public List<Ticket> findByVisitor(int userId) {
+        connection = ConnectionFactory.getConnection();
+
         List<Ticket> tickets = new ArrayList<>();
 
         try {
@@ -227,6 +237,8 @@ public class TicketsRepository {
     }
 
     public Optional<Ticket> findById(int id) {
+        connection = ConnectionFactory.getConnection();
+
         Optional<Ticket> result = Optional.empty();
 
         try {
@@ -247,6 +259,8 @@ public class TicketsRepository {
     }
 
     public Optional<Ticket> findBySessionAndRowAndPlace(int sessionId, int row, int place) {
+        connection = ConnectionFactory.getConnection();
+
         Optional<Ticket> result = Optional.empty();
 
         try {
@@ -269,6 +283,8 @@ public class TicketsRepository {
     }
 
     public boolean save(@NotNull Ticket ticket) {
+        connection = ConnectionFactory.getConnection();
+
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(SAVE_TEMPLATE);
             preparedStatement.setInt(1, ticket.getSessionId());
@@ -290,6 +306,8 @@ public class TicketsRepository {
     }
 
     public boolean update(int id, @NotNull Ticket updatedTicket) {
+        connection = ConnectionFactory.getConnection();
+
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_TEMPLATE);
 
@@ -309,6 +327,8 @@ public class TicketsRepository {
     }
 
     public boolean delete(int id) {
+        connection = ConnectionFactory.getConnection();
+
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(DELETE_TEMPLATE);
             preparedStatement.setInt(1, id);

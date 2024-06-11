@@ -21,15 +21,16 @@ public class CountriesRepository {
     private static final String UPDATE_TEMPLATE = "UPDATE countries SET name = ? WHERE id = ?";
     private static final String DELETE_TEMPLATE = "DELETE FROM countries WHERE id = ?";
 
-    private final Connection connection;
+    private Connection connection;
     private final CountryMapper countryMapper;
 
     public CountriesRepository() {
-        connection = ConnectionFactory.getConnection();
         countryMapper = new CountryMapper();
     }
 
     public List<Country> findAll() {
+        connection = ConnectionFactory.getConnection();
+
         List<Country> countries = new ArrayList<>();
 
         try {
@@ -48,6 +49,8 @@ public class CountriesRepository {
     }
 
     public Optional<Country> findById(int id) {
+        connection = ConnectionFactory.getConnection();
+
         Optional<Country> result = Optional.empty();
 
         try {
@@ -68,6 +71,8 @@ public class CountriesRepository {
     }
 
     public boolean save(@NotNull Country country) {
+        connection = ConnectionFactory.getConnection();
+
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(SAVE_TEMPLATE);
             preparedStatement.setString(1, country.getName());
@@ -83,6 +88,8 @@ public class CountriesRepository {
     }
 
     public boolean update(int id, @NotNull Country updatedCountry) {
+        connection = ConnectionFactory.getConnection();
+
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_TEMPLATE);
 
@@ -96,6 +103,8 @@ public class CountriesRepository {
     }
 
     public boolean delete(int id) {
+        connection = ConnectionFactory.getConnection();
+
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(DELETE_TEMPLATE);
             preparedStatement.setInt(1, id);

@@ -22,15 +22,16 @@ public class DirectorsRepository {
     private static final String UPDATE_TEMPLATE = "UPDATE directors SET name = ? WHERE id = ?";
     private static final String DELETE_TEMPLATE = "DELETE FROM directors WHERE id = ?";
 
-    private final Connection connection;
+    private Connection connection;
     private final DirectorMapper directorMapper;
 
     public DirectorsRepository() {
-        connection = ConnectionFactory.getConnection();
         directorMapper = new DirectorMapper();
     }
 
     public List<Director> findAll() {
+        connection = ConnectionFactory.getConnection();
+
         List<Director> directors = new ArrayList<>();
 
         try {
@@ -49,6 +50,8 @@ public class DirectorsRepository {
     }
 
     public Optional<Director> findById(int id) {
+        connection = ConnectionFactory.getConnection();
+
         Optional<Director> result = Optional.empty();
 
         try {
@@ -69,6 +72,8 @@ public class DirectorsRepository {
     }
 
     public Optional<Director> findByName(String name) {
+        connection = ConnectionFactory.getConnection();
+
         Optional<Director> result = Optional.empty();
 
         try {
@@ -89,6 +94,8 @@ public class DirectorsRepository {
     }
 
     public boolean save(@NotNull Director director) {
+        connection = ConnectionFactory.getConnection();
+
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(SAVE_TEMPLATE);
             preparedStatement.setString(1, director.getName());
@@ -104,6 +111,8 @@ public class DirectorsRepository {
     }
 
     public boolean update(int id, @NotNull Director updatedDirector) {
+        connection = ConnectionFactory.getConnection();
+
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_TEMPLATE);
 
@@ -117,6 +126,8 @@ public class DirectorsRepository {
     }
 
     public boolean delete(int id) {
+        connection = ConnectionFactory.getConnection();
+
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(DELETE_TEMPLATE);
             preparedStatement.setInt(1, id);

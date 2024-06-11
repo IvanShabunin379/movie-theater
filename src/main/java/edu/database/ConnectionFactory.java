@@ -22,8 +22,4 @@ public class ConnectionFactory {
             throw new DatabaseConnectionException(e);
         }
     }
-
-    public static void main(String []args){
-        ConnectionFactory.getConnection();
-    }
 }
