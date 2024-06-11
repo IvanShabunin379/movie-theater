@@ -19,6 +19,14 @@ import java.util.Optional;
 public class SessionsRepository {
     private static final String FIND_ALL_TEMPLATE = "SELECT id, movie_id, auditorium_id, start_time FROM sessions";
     private static final String FIND_BY_ID_TEMPLATE = "SELECT id, movie_id, auditorium_id, start_time FROM sessions WHERE id = ?";
+    private static final String FIND_BY_MOVIE_AND_AUDITORIUM_AND_START_TIME_TEMPLATE = """
+            SELECT id,
+                   movie_id,
+                   auditorium_id,
+                   start_time
+            FROM sessions
+            WHERE movie_id = ? AND auditorium_id = ? AND start_time = ?
+            """;
     private static final String FIND_BY_MOVIE_TEMPLATE = """
             SELECT id,
                    movie_id,
@@ -189,6 +197,28 @@ public class SessionsRepository {
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(FIND_BY_ID_TEMPLATE);
             preparedStatement.setInt(1, id);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                Session session = sessionMapper.mapRow(resultSet);
+                result = Optional.of(session);
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(e);
+        }
+
+        return result;
+    }
+
+    public Optional<Session> findByMovieAndAuditoriumAndStartTime(int movieId, int auditoriumId, OffsetDateTime startTime) {
+        Optional<Session> result = Optional.empty();
+
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(FIND_BY_MOVIE_AND_AUDITORIUM_AND_START_TIME_TEMPLATE);
+            preparedStatement.setInt(1, movieId);
+            preparedStatement.setInt(2, auditoriumId);
+            preparedStatement.setTimestamp(3, Timestamp.from(startTime.toInstant()));
 
             ResultSet resultSet = preparedStatement.executeQuery();
 
