@@ -15,7 +15,7 @@ public class MovieMapper implements RowMapper<Movie> {
                 resultSet.getInt("year"),
                 resultSet.getInt("country_id"),
                 resultSet.getString("poster_path"),
-                MovieGenre.valueOf(resultSet.getString("genre")),
+                MovieGenre.valueOf(resultSet.getString("genre").toUpperCase()),
                 resultSet.getInt("duration"),
                 resultSet.getString("description"),
                 resultSet.getInt("director_id"),

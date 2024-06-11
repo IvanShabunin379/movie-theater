@@ -1,17 +1,14 @@
 package edu.service;
 
-import edu.domain.model.Auditorium;
-import edu.domain.model.Session;
-import edu.domain.model.Ticket;
-import edu.domain.repository.AuditoriumsRepository;
-import edu.domain.repository.SessionsRepository;
-import edu.domain.repository.TicketsRepository;
+import edu.domain.model.*;
+import edu.domain.repository.*;
 import edu.service.exception.session.SessionAlreadyExistsException;
 import edu.service.exception.session.SessionNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 
 @RequiredArgsConstructor

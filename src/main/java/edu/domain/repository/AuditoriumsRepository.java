@@ -37,8 +37,8 @@ public class AuditoriumsRepository {
             VALUES (?, ?, ?, ?, ?)
             """;
     private static final String UPDATE_TEMPLATE = """
-            UPDATE auditoriums 
-            SET id = ?, 
+            UPDATE auditoriums
+            SET id = ?,
                 number_of_rows = ?,
                 number_of_seats_in_row = ?,
                 is_3D = ?,

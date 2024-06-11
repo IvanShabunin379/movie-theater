@@ -276,8 +276,8 @@ public class TicketsRepository {
             preparedStatement.setInt(3, ticket.getPlace());
             preparedStatement.setBigDecimal(4, ticket.getPrice());
             preparedStatement.setBoolean(5, ticket.getIsPurchased());
-            preparedStatement.setTimestamp(6, Timestamp.from(ticket.getTimeOfPurchase().toInstant()));
-            preparedStatement.setInt(7, ticket.getVisitorId());
+            preparedStatement.setTimestamp(6, null);
+            preparedStatement.setObject(7, null);
 
             return preparedStatement.executeUpdate() == 1;
         } catch (SQLException e) {

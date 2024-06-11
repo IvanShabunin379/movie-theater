@@ -19,13 +19,13 @@ import java.util.Optional;
 public class SessionsRepository {
     private static final String FIND_ALL_TEMPLATE = "SELECT id, movie_id, auditorium_id, start_time FROM sessions";
     private static final String FIND_BY_ID_TEMPLATE = "SELECT id, movie_id, auditorium_id, start_time FROM sessions WHERE id = ?";
-    private static final String FIND_BY_MOVIE_AND_AUDITORIUM_AND_START_TIME = """
+    private static final String FIND_BY_MOVIE_AND_AUDITORIUM_AND_START_TIME_TEMPLATE = """
             SELECT id,
                    movie_id,
                    auditorium_id,
                    start_time
             FROM sessions
-            WHERE movie_id = ? AND auditorium_id = ? AND = start_time = ?
+            WHERE movie_id = ? AND auditorium_id = ? AND start_time = ?
             """;
     private static final String FIND_BY_MOVIE_TEMPLATE = """
             SELECT id,
@@ -204,7 +204,7 @@ public class SessionsRepository {
         Optional<Session> result = Optional.empty();
 
         try {
-            PreparedStatement preparedStatement = connection.prepareStatement(FIND_BY_MOVIE_AND_AUDITORIUM_AND_START_TIME);
+            PreparedStatement preparedStatement = connection.prepareStatement(FIND_BY_MOVIE_AND_AUDITORIUM_AND_START_TIME_TEMPLATE);
             preparedStatement.setInt(1, movieId);
             preparedStatement.setInt(2, auditoriumId);
             preparedStatement.setTimestamp(3, Timestamp.from(startTime.toInstant()));
@@ -225,7 +225,6 @@ public class SessionsRepository {
     public boolean save(@NotNull Session session) {
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(SAVE_TEMPLATE);
-            preparedStatement.setInt(1, session.getId());
             preparedStatement.setInt(1, session.getMovieId());
             preparedStatement.setInt(2, session.getAuditoriumId());
             preparedStatement.setTimestamp(3, Timestamp.from(session.getStartTime().toInstant()));
