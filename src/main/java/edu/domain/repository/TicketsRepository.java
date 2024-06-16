@@ -128,7 +128,6 @@ public class TicketsRepository {
     private final TicketMapper ticketMapper;
 
     public TicketsRepository() {
-        connection = ConnectionFactory.getConnection();
         ticketMapper = new TicketMapper();
     }
 

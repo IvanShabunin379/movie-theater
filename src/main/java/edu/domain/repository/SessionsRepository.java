@@ -1,3 +1,4 @@
+
 package edu.domain.repository;
 
 import edu.database.ConnectionFactory;
@@ -212,6 +213,8 @@ public class SessionsRepository {
     }
 
     public Optional<Session> findByMovieAndAuditoriumAndStartTime(int movieId, int auditoriumId, OffsetDateTime startTime) {
+        connection = ConnectionFactory.getConnection();
+
         Optional<Session> result = Optional.empty();
 
         try {

@@ -36,7 +36,6 @@ public class UsersRepository {
     private final UserMapper userMapper;
 
     public UsersRepository() {
-        connection = ConnectionFactory.getConnection();
         userMapper = new UserMapper();
     }
 
