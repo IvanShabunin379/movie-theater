@@ -38,7 +38,8 @@ public class UsersService {
         Ticket ticket = ticketsRepository.findById(ticketId)
                 .orElseThrow(TicketNotFoundException::new);
 
-        return usersRepository.findById(ticket.getVisitorId()).get();
+        return usersRepository.findById(ticket.getVisitorId())
+                .orElseThrow(UserNotFoundException::new);
     }
 
     public void updateName(int id, String name) {

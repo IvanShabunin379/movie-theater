@@ -6,6 +6,7 @@ import edu.domain.model.Ticket;
 import edu.domain.repository.AuditoriumsRepository;
 import edu.domain.repository.SessionsRepository;
 import edu.domain.repository.TicketsRepository;
+import edu.service.exception.auditorium.AuditoriumNotFoundException;
 import edu.service.exception.session.SessionAlreadyExistsException;
 import edu.service.exception.session.SessionNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -30,12 +31,16 @@ public class SessionsService {
             throw new SessionAlreadyExistsException();
         }
 
-        Auditorium auditorium = auditoriumsRepository.findById(auditoriumId).get();
+        Auditorium auditorium = auditoriumsRepository.findById(auditoriumId)
+                .orElseThrow(AuditoriumNotFoundException::new);
+
+        int sessionId = sessionsRepository.findByMovieAndAuditoriumAndStartTime(movieId, auditoriumId, startTime)
+                .orElseThrow(SessionNotFoundException::new)
+                .getId();
         for (int i = 1; i <= auditorium.getNumberOfRows(); ++i) {
             for (int j = 1; j <= auditorium.getNumberOfSeatsInRow(); ++j) {
                 Ticket ticket = new Ticket();
 
-                int sessionId = sessionsRepository.findByMovieAndAuditoriumAndStartTime(movieId, auditoriumId, startTime).get().getId();
                 ticket.setSessionId(sessionId);
                 ticket.setRow(i);
                 ticket.setPlace(j);

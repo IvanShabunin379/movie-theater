@@ -14,7 +14,6 @@ public class AuditoriumsService {
     private static final Integer MIN_TOTAL_NUMBER_OF_SEATS = 5;
     private static final Integer MAX_TOTAL_NUMBER_OF_SEATS = 1000;
 
-
     private final AuditoriumsRepository auditoriumsRepository;
     private final SessionsRepository sessionsRepository;
 
@@ -38,7 +37,8 @@ public class AuditoriumsService {
         Session session = sessionsRepository.findById(sessionId)
                 .orElseThrow(SessionNotFoundException::new);
 
-        return auditoriumsRepository.findById(session.getId()).get();
+        return auditoriumsRepository.findById(session.getId())
+                .orElseThrow(AuditoriumNotFoundException::new);
     }
 
     public void updateNumberOfSeats(int id, int newNumberOfRows, int newNumberOfSeatsInRow) {
