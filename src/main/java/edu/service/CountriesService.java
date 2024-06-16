@@ -15,6 +15,10 @@ public class CountriesService {
     private final MoviesRepository moviesRepository;
 
     public void add(String name) {
+        if (name == null || name.isEmpty()) {
+            throw new IllegalArgumentException("Country name should be not null and not empty.");
+        }
+
         Country country = new Country();
         country.setName(name);
 
@@ -33,6 +37,7 @@ public class CountriesService {
         Movie movie = moviesRepository.findById(movieId)
                 .orElseThrow(MovieNotFoundException::new);
 
-        return countriesRepository.findById(movie.getCountryId()).get();
+        return countriesRepository.findById(movie.getCountryId())
+                .orElseThrow(CountryNotFoundException::new);
     }
 }

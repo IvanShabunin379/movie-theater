@@ -8,6 +8,8 @@ import edu.domain.repository.AuditoriumsRepository;
 import edu.domain.repository.SessionsRepository;
 import edu.domain.repository.TicketsRepository;
 import edu.domain.repository.UsersRepository;
+import edu.service.exception.auditorium.AuditoriumNotFoundException;
+import edu.service.exception.session.SessionNotFoundException;
 import edu.service.exception.ticket.TicketAlreadyExistsException;
 import edu.service.exception.ticket.TicketAlreadyPurchasedException;
 import edu.service.exception.ticket.TicketNotFoundException;
@@ -107,8 +109,10 @@ public class TicketsService {
     }
 
     private void validateTicketRowAndPlace(Ticket ticket) {
-        Session ticketSession = sessionsRepository.findById(ticket.getSessionId()).get();
-        Auditorium auditorium = auditoriumsRepository.findById(ticketSession.getAuditoriumId()).get();
+        Session ticketSession = sessionsRepository.findById(ticket.getSessionId())
+                .orElseThrow(SessionNotFoundException::new);
+        Auditorium auditorium = auditoriumsRepository.findById(ticketSession.getAuditoriumId())
+                .orElseThrow(AuditoriumNotFoundException::new);
 
         if (ticket.getRow() < 0 || ticket.getRow() > auditorium.getNumberOfRows()) {
             throw new IllegalArgumentException("Ticket row should be between 0 and number of rows in auditorium.");
@@ -120,6 +124,10 @@ public class TicketsService {
     }
 
     private void validateTicketPrice(BigDecimal price) {
+        if (price == null) {
+            throw new IllegalArgumentException("Ticket price should be not null.");
+        }
+
         if (price.compareTo(BigDecimal.valueOf(MIN_PRICE)) < 0 || price.compareTo(BigDecimal.valueOf(MAX_PRICE)) > 0) {
             throw new IllegalArgumentException("Ticket price should be between " + MIN_PRICE + " and " + MAX_PRICE + ".");
         }

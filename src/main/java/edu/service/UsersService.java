@@ -18,8 +18,6 @@ public class UsersService {
     private final TicketsRepository ticketsRepository;
 
     public void register(String name, String email, String passwordHash) {
-        validateEmailAndPassword(email, passwordHash);
-
         User user = new User();
         user.setName(name);
         user.setEmail(email);
@@ -40,7 +38,8 @@ public class UsersService {
         Ticket ticket = ticketsRepository.findById(ticketId)
                 .orElseThrow(TicketNotFoundException::new);
 
-        return usersRepository.findById(ticket.getVisitorId()).get();
+        return usersRepository.findById(ticket.getVisitorId())
+                .orElseThrow(UserNotFoundException::new);
     }
 
     public void updateName(int id, String name) {
@@ -79,14 +78,14 @@ public class UsersService {
     }
 
     private void validatePassword(String password) {
-        if (password.length() < MIN_PASSWORD_LEN) {
+        if (password == null || password.length() < MIN_PASSWORD_LEN) {
             throw new IllegalArgumentException("Password len should be greater than 5");
         }
     }
 
     private void validateEmail(String email) {
         EmailValidator emailValidator = EmailValidator.getInstance();
-        if (!emailValidator.isValid(email)) {
+        if (email == null || !emailValidator.isValid(email)) {
             throw new IllegalArgumentException("Invalid email.");
         }
     }

@@ -29,6 +29,10 @@ public class MoviesService {
                     boolean isCurrentlyAtBoxOffice) {
         validateMovieAttributes(year, duration);
 
+        if (name == null) {
+            throw new IllegalArgumentException("Movie name should be not null.");
+        }
+
         Movie movie = new Movie();
         movie.setName(name);
         movie.setYear(year);
@@ -61,6 +65,11 @@ public class MoviesService {
         movieWithUpdatedPoster.setPosterPath(newPosterPath);
 
         moviesRepository.update(id, movieWithUpdatedPoster);
+    }
+
+    public Movie getByNameAndDirectorAndYear(String name, int directorId, int year) {
+        return moviesRepository.findByNameAndDirectorAndYear(name, directorId, year)
+                .orElseThrow(MovieNotFoundException::new);
     }
 
     public void updateDescription(int id, String newDescription) {

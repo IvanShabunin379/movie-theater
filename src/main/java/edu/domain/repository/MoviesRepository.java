@@ -24,7 +24,7 @@ public class MoviesRepository {
                    genre,
                    duration,
                    description,
-                   movie_id,
+                   director_id,
                    is_currently_at_box_office
             FROM movies
             """;
@@ -37,10 +37,10 @@ public class MoviesRepository {
                    genre,
                    duration,
                    description,
-                   movie_id,
+                   director_id,
                    is_currently_at_box_office
             FROM movies
-            WHERE is_currently_at_box_office = true     
+            WHERE is_currently_at_box_office = true
             """;
     private static final String FIND_BY_ID_TEMPLATE = """
             SELECT id,
@@ -51,10 +51,24 @@ public class MoviesRepository {
                    genre,
                    duration,
                    description,
-                   movie_id,
+                   director_id,
                    is_currently_at_box_office
             FROM movies
             WHERE id = ?
+            """;
+    private static final String FIND_BY_NAME_AND_DIRECTOR_AND_YEAR_TEMPLATE = """
+            SELECT id,
+                   name,
+                   year,
+                   country_id,
+                   poster_path,
+                   genre,
+                   duration,
+                   description,
+                   director_id,
+                   is_currently_at_box_office
+            FROM movies
+            WHERE name = ? AND director_id = ? AND year = ?
             """;
     private static final String SAVE_TEMPLATE = """
             INSERT INTO movies(name,
@@ -64,7 +78,7 @@ public class MoviesRepository {
                                genre,
                                duration,
                                description,
-                               movie_id,
+                               director_id,
                                is_currently_at_box_office)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             """;
@@ -77,21 +91,22 @@ public class MoviesRepository {
                 genre = ?,
                 duration = ?,
                 description = ?,
-                movie_id = ?,
+                director_id = ?,
                 is_currently_at_box_office = ?
             WHERE id = ?
             """;
     private static final String DELETE_TEMPLATE = "DELETE FROM movies WHERE id = ?";
 
-    private final Connection connection;
+    private Connection connection;
     private final MovieMapper movieMapper;
 
     public MoviesRepository() {
-        connection = ConnectionFactory.getConnection();
         movieMapper = new MovieMapper();
     }
 
     public List<Movie> findAll() {
+        connection = ConnectionFactory.getConnection();
+
         List<Movie> movies = new ArrayList<>();
 
         try {
@@ -110,6 +125,8 @@ public class MoviesRepository {
     }
 
     public List<Movie> findAllAreCurrentlyAtBoxOffice() {
+        connection = ConnectionFactory.getConnection();
+
         List<Movie> movies = new ArrayList<>();
 
         try {
@@ -128,6 +145,8 @@ public class MoviesRepository {
     }
 
     public Optional<Movie> findById(int id) {
+        connection = ConnectionFactory.getConnection();
+
         Optional<Movie> result = Optional.empty();
 
         try {
@@ -147,7 +166,33 @@ public class MoviesRepository {
         return result;
     }
 
+    public Optional<Movie> findByNameAndDirectorAndYear(String name, int directorId, int year) {
+        connection = ConnectionFactory.getConnection();
+
+        Optional<Movie> result = Optional.empty();
+
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(FIND_BY_NAME_AND_DIRECTOR_AND_YEAR_TEMPLATE);
+            preparedStatement.setString(1, name);
+            preparedStatement.setInt(2, directorId);
+            preparedStatement.setInt(3, year);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                Movie movie = movieMapper.mapRow(resultSet);
+                result = Optional.of(movie);
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(e);
+        }
+
+        return result;
+    }
+
     public boolean save(@NotNull Movie movie) {
+        connection = ConnectionFactory.getConnection();
+
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(SAVE_TEMPLATE);
             preparedStatement.setString(1, movie.getName());
@@ -171,6 +216,8 @@ public class MoviesRepository {
     }
 
     public boolean update(int id, @NotNull Movie updatedMovie) {
+        connection = ConnectionFactory.getConnection();
+
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_TEMPLATE);
 
@@ -192,6 +239,8 @@ public class MoviesRepository {
     }
 
     public boolean delete(int id) {
+        connection = ConnectionFactory.getConnection();
+
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(DELETE_TEMPLATE);
             preparedStatement.setInt(1, id);

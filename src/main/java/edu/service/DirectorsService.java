@@ -15,6 +15,10 @@ public class DirectorsService {
     private final MoviesRepository moviesRepository;
 
     public void add(String name) {
+        if (name == null || name.isEmpty()) {
+            throw new IllegalArgumentException("Director name should be not null and not empty.");
+        }
+
         Director director = new Director();
         director.setName(name);
 
@@ -25,7 +29,7 @@ public class DirectorsService {
 
     public void remove(int id) {
         if (!directorsRepository.delete(id)) {
-            throw new DirectorNotFoundException();
+            throw new DirectorAlreadyExistsException();
         }
     }
 
@@ -33,6 +37,12 @@ public class DirectorsService {
         Movie movie = moviesRepository.findById(movieId)
                 .orElseThrow(MovieNotFoundException::new);
 
-        return directorsRepository.findById(movie.getDirectorId()).get();
+        return directorsRepository.findById(movie.getDirectorId())
+                .orElseThrow(DirectorNotFoundException::new);
+    }
+
+    public Director getByName(String name) {
+        return directorsRepository.findByName(name)
+                .orElseThrow(DirectorNotFoundException::new);
     }
 }
