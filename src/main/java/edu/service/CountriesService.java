@@ -37,6 +37,7 @@ public class CountriesService {
         Movie movie = moviesRepository.findById(movieId)
                 .orElseThrow(MovieNotFoundException::new);
 
-        return countriesRepository.findById(movie.getCountryId()).get();
+        return countriesRepository.findById(movie.getCountryId())
+                .orElseThrow(CountryNotFoundException::new);
     }
 }

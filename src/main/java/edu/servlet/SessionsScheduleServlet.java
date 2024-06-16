@@ -31,7 +31,7 @@ import java.util.Map;
 @WebServlet("/schedule")
 public class SessionsScheduleServlet extends HttpServlet {
     private final MoviesService moviesService = new MoviesService(new MoviesRepository());
-    private SessionsService sessionsService = new SessionsService(new SessionsRepository(), new TicketsRepository(), new AuditoriumsRepository());
+    private final SessionsService sessionsService = new SessionsService(new SessionsRepository(), new TicketsRepository(), new AuditoriumsRepository());
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String dateParam = request.getParameter("date");

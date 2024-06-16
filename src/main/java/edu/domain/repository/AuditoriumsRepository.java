@@ -29,7 +29,7 @@ public class AuditoriumsRepository {
                   number_of_seats_in_row,
                   is_3D,
                   is_VIP
-            FROM auditoriums 
+            FROM auditoriums
             WHERE id = ?
             """;
     private static final String SAVE_TEMPLATE = """
@@ -47,15 +47,16 @@ public class AuditoriumsRepository {
             """;
     private static final String DELETE_TEMPLATE = "DELETE FROM auditoriums WHERE id = ?";
 
-    private final Connection connection;
+    private Connection connection;
     private final AuditoriumMapper auditoriumMapper;
 
     public AuditoriumsRepository() {
-        connection = ConnectionFactory.getConnection();
         auditoriumMapper = new AuditoriumMapper();
     }
 
     public List<Auditorium> findAll() {
+        connection = ConnectionFactory.getConnection();
+
         List<Auditorium> auditoriums = new ArrayList<>();
 
         try {
@@ -74,6 +75,8 @@ public class AuditoriumsRepository {
     }
 
     public Optional<Auditorium> findById(int id) {
+        connection = ConnectionFactory.getConnection();
+
         Optional<Auditorium> result = Optional.empty();
 
         try {
@@ -94,6 +97,8 @@ public class AuditoriumsRepository {
     }
 
     public boolean save(@NotNull Auditorium auditorium) {
+        connection = ConnectionFactory.getConnection();
+
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(SAVE_TEMPLATE);
             preparedStatement.setInt(1, auditorium.getId());
@@ -113,6 +118,8 @@ public class AuditoriumsRepository {
     }
 
     public boolean update(int id, @NotNull Auditorium updatedAuditorium) {
+        connection = ConnectionFactory.getConnection();
+
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_TEMPLATE);
 
@@ -130,6 +137,8 @@ public class AuditoriumsRepository {
     }
 
     public boolean delete(int id) {
+        connection = ConnectionFactory.getConnection();
+
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(DELETE_TEMPLATE);
             preparedStatement.setInt(1, id);

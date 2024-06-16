@@ -18,8 +18,6 @@ public class UsersService {
     private final TicketsRepository ticketsRepository;
 
     public void register(String name, String email, String passwordHash) {
-        validateEmailAndPassword(email, passwordHash);
-
         User user = new User();
         user.setName(name);
         user.setEmail(email);
@@ -40,7 +38,8 @@ public class UsersService {
         Ticket ticket = ticketsRepository.findById(ticketId)
                 .orElseThrow(TicketNotFoundException::new);
 
-        return usersRepository.findById(ticket.getVisitorId()).get();
+        return usersRepository.findById(ticket.getVisitorId())
+                .orElseThrow(UserNotFoundException::new);
     }
 
     public void updateName(int id, String name) {
