@@ -40,7 +40,7 @@ public class MoviesRepository {
                    director_id,
                    is_currently_at_box_office
             FROM movies
-            WHERE is_currently_at_box_office = true     
+            WHERE is_currently_at_box_office = true
             """;
     private static final String FIND_BY_ID_TEMPLATE = """
             SELECT id,
@@ -97,15 +97,16 @@ public class MoviesRepository {
             """;
     private static final String DELETE_TEMPLATE = "DELETE FROM movies WHERE id = ?";
 
-    private final Connection connection;
+    private Connection connection;
     private final MovieMapper movieMapper;
 
     public MoviesRepository() {
-        connection = ConnectionFactory.getConnection();
         movieMapper = new MovieMapper();
     }
 
     public List<Movie> findAll() {
+        connection = ConnectionFactory.getConnection();
+
         List<Movie> movies = new ArrayList<>();
 
         try {
@@ -124,6 +125,8 @@ public class MoviesRepository {
     }
 
     public List<Movie> findAllAreCurrentlyAtBoxOffice() {
+        connection = ConnectionFactory.getConnection();
+
         List<Movie> movies = new ArrayList<>();
 
         try {
@@ -142,6 +145,8 @@ public class MoviesRepository {
     }
 
     public Optional<Movie> findById(int id) {
+        connection = ConnectionFactory.getConnection();
+
         Optional<Movie> result = Optional.empty();
 
         try {
@@ -162,6 +167,8 @@ public class MoviesRepository {
     }
 
     public Optional<Movie> findByNameAndDirectorAndYear(String name, int directorId, int year) {
+        connection = ConnectionFactory.getConnection();
+
         Optional<Movie> result = Optional.empty();
 
         try {
@@ -184,6 +191,8 @@ public class MoviesRepository {
     }
 
     public boolean save(@NotNull Movie movie) {
+        connection = ConnectionFactory.getConnection();
+
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(SAVE_TEMPLATE);
             preparedStatement.setString(1, movie.getName());
@@ -207,6 +216,8 @@ public class MoviesRepository {
     }
 
     public boolean update(int id, @NotNull Movie updatedMovie) {
+        connection = ConnectionFactory.getConnection();
+
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_TEMPLATE);
 
@@ -228,6 +239,8 @@ public class MoviesRepository {
     }
 
     public boolean delete(int id) {
+        connection = ConnectionFactory.getConnection();
+
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(DELETE_TEMPLATE);
             preparedStatement.setInt(1, id);

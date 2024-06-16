@@ -24,7 +24,7 @@ public class UsersRepository {
             """;
     private static final String SAVE_TEMPLATE = "INSERT INTO users(name, email, password_hash) VALUES (?, ?, ?)";
     private static final String UPDATE_TEMPLATE = """
-            UPDATE users 
+            UPDATE users
             SET name = ?,
                 email = ?,
                 password_hash = ?
@@ -32,7 +32,7 @@ public class UsersRepository {
             """;
     private static final String DELETE_TEMPLATE = "DELETE FROM users WHERE id = ?";
 
-    private final Connection connection;
+    private Connection connection;
     private final UserMapper userMapper;
 
     public UsersRepository() {
@@ -41,6 +41,8 @@ public class UsersRepository {
     }
 
     public List<User> findAll() {
+        connection = ConnectionFactory.getConnection();
+
         List<User> users = new ArrayList<>();
 
         try {
@@ -59,6 +61,8 @@ public class UsersRepository {
     }
 
     public Optional<User> findById(int id) {
+        connection = ConnectionFactory.getConnection();
+
         Optional<User> result = Optional.empty();
 
         try {
@@ -79,6 +83,8 @@ public class UsersRepository {
     }
 
     public Optional<User> findByEmail(@NotNull String email) {
+        connection = ConnectionFactory.getConnection();
+
         Optional<User> result = Optional.empty();
 
         try {
@@ -99,6 +105,8 @@ public class UsersRepository {
     }
 
     public boolean save(@NotNull User user) {
+        connection = ConnectionFactory.getConnection();
+
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(SAVE_TEMPLATE);
             preparedStatement.setString(1, user.getName());
@@ -116,6 +124,8 @@ public class UsersRepository {
     }
 
     public boolean update(int id, @NotNull User updatedUser) {
+        connection = ConnectionFactory.getConnection();
+
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_TEMPLATE);
 
@@ -131,6 +141,8 @@ public class UsersRepository {
     }
 
     public boolean delete(int id) {
+        connection = ConnectionFactory.getConnection();
+
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(DELETE_TEMPLATE);
             preparedStatement.setInt(1, id);
