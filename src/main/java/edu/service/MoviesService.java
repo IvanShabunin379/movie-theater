@@ -102,12 +102,12 @@ public class MoviesService {
 
     private void validateMovieAttributes(int year, int duration) {
         if (year < 1895 || Year.of(year).isAfter(Year.now())) {
-            throw new IllegalArgumentException("Movie year should be between " + MIN_YEAR +" and current year.");
+            throw new IllegalArgumentException("Movie year should be between " + MIN_YEAR + " and current year.");
         }
 
         if (duration < 5 || duration > 1000) {
             throw new IllegalArgumentException("Movie duration should be between "
-                    + MIN_DURATION +" and " + MAX_DURATION + " minutes.");
+                    + MIN_DURATION + " and " + MAX_DURATION + " minutes.");
         }
     }
 }

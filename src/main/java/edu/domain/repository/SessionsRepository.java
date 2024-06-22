@@ -12,7 +12,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -121,14 +121,14 @@ public class SessionsRepository {
         return sessions;
     }
 
-    public List<Session> findByDate(OffsetDateTime date) {
+    public List<Session> findByDate(LocalDateTime date) {
         connection = ConnectionFactory.getConnection();
 
         List<Session> sessions = new ArrayList<>();
 
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(FIND_BY_DATE_TEMPLATE);
-            preparedStatement.setTimestamp(1, Timestamp.from(date.toInstant()));
+            preparedStatement.setTimestamp(1, Timestamp.valueOf(date));
 
             ResultSet resultSet = preparedStatement.executeQuery();
 
@@ -143,15 +143,15 @@ public class SessionsRepository {
         return sessions;
     }
 
-    public List<Session> findBetweenTimestamps(OffsetDateTime after, OffsetDateTime before) {
+    public List<Session> findBetweenTimestamps(LocalDateTime after, LocalDateTime before) {
         connection = ConnectionFactory.getConnection();
 
         List<Session> sessions = new ArrayList<>();
 
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(FIND_BETWEEN_TIMESTAMPS_TEMPLATE);
-            preparedStatement.setTimestamp(1, Timestamp.from(after.toInstant()));
-            preparedStatement.setTimestamp(2, Timestamp.from(before.toInstant()));
+            preparedStatement.setTimestamp(1, Timestamp.valueOf(after));
+            preparedStatement.setTimestamp(2, Timestamp.valueOf(before));
 
             ResultSet resultSet = preparedStatement.executeQuery();
 
@@ -166,7 +166,7 @@ public class SessionsRepository {
         return sessions;
     }
 
-    public List<Session> findByMovieBetweenTimestamps(int movieId, OffsetDateTime after, OffsetDateTime before) {
+    public List<Session> findByMovieBetweenTimestamps(int movieId, LocalDateTime after, LocalDateTime before) {
         connection = ConnectionFactory.getConnection();
 
         List<Session> sessions = new ArrayList<>();
@@ -174,8 +174,8 @@ public class SessionsRepository {
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(FIND_BY_MOVIE_BETWEEN_TIMESTAMPS_TEMPLATE);
             preparedStatement.setInt(1, movieId);
-            preparedStatement.setTimestamp(2, Timestamp.from(after.toInstant()));
-            preparedStatement.setTimestamp(3, Timestamp.from(before.toInstant()));
+            preparedStatement.setTimestamp(2, Timestamp.valueOf(after));
+            preparedStatement.setTimestamp(3, Timestamp.valueOf(before));
 
             ResultSet resultSet = preparedStatement.executeQuery();
 
@@ -212,7 +212,7 @@ public class SessionsRepository {
         return result;
     }
 
-    public Optional<Session> findByMovieAndAuditoriumAndStartTime(int movieId, int auditoriumId, OffsetDateTime startTime) {
+    public Optional<Session> findByMovieAndAuditoriumAndStartTime(int movieId, int auditoriumId, LocalDateTime startTime) {
         connection = ConnectionFactory.getConnection();
 
         Optional<Session> result = Optional.empty();
@@ -221,7 +221,7 @@ public class SessionsRepository {
             PreparedStatement preparedStatement = connection.prepareStatement(FIND_BY_MOVIE_AND_AUDITORIUM_AND_START_TIME_TEMPLATE);
             preparedStatement.setInt(1, movieId);
             preparedStatement.setInt(2, auditoriumId);
-            preparedStatement.setTimestamp(3, Timestamp.from(startTime.toInstant()));
+            preparedStatement.setTimestamp(3, Timestamp.valueOf(startTime));
 
             ResultSet resultSet = preparedStatement.executeQuery();
 
@@ -244,7 +244,7 @@ public class SessionsRepository {
             preparedStatement.setInt(1, session.getId());
             preparedStatement.setInt(1, session.getMovieId());
             preparedStatement.setInt(2, session.getAuditoriumId());
-            preparedStatement.setTimestamp(3, Timestamp.from(session.getStartTime().toInstant()));
+            preparedStatement.setTimestamp(3, Timestamp.valueOf(session.getStartTime()));
 
             return preparedStatement.executeUpdate() == 1;
         } catch (SQLException e) {
@@ -264,7 +264,7 @@ public class SessionsRepository {
 
             preparedStatement.setInt(1, updatedSession.getMovieId());
             preparedStatement.setInt(2, updatedSession.getAuditoriumId());
-            preparedStatement.setTimestamp(3, Timestamp.from(updatedSession.getStartTime().toInstant()));
+            preparedStatement.setTimestamp(3, Timestamp.valueOf(updatedSession.getStartTime()));
             preparedStatement.setInt(4, updatedSession.getId());
 
             return preparedStatement.executeUpdate() == 1;

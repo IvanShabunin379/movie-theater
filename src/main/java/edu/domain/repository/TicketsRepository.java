@@ -291,7 +291,7 @@ public class TicketsRepository {
             preparedStatement.setInt(3, ticket.getPlace());
             preparedStatement.setBigDecimal(4, ticket.getPrice());
             preparedStatement.setBoolean(5, ticket.getIsPurchased());
-            preparedStatement.setTimestamp(6, Timestamp.from(ticket.getTimeOfPurchase().toInstant()));
+            preparedStatement.setTimestamp(6, Timestamp.valueOf(ticket.getTimeOfPurchase()));
             preparedStatement.setInt(7, ticket.getVisitorId());
 
             return preparedStatement.executeUpdate() == 1;
@@ -315,7 +315,7 @@ public class TicketsRepository {
             preparedStatement.setInt(3, updatedTicket.getPlace());
             preparedStatement.setBigDecimal(4, updatedTicket.getPrice());
             preparedStatement.setBoolean(5, updatedTicket.getIsPurchased());
-            preparedStatement.setTimestamp(6, Timestamp.from(updatedTicket.getTimeOfPurchase().toInstant()));
+            preparedStatement.setTimestamp(6, Timestamp.valueOf(updatedTicket.getTimeOfPurchase()));
             preparedStatement.setInt(7, updatedTicket.getVisitorId());
             preparedStatement.setInt(8, id);
 

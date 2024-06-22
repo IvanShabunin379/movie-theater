@@ -18,7 +18,7 @@ import edu.service.exception.user.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 import java.math.BigDecimal;
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -36,7 +36,7 @@ public class TicketsService {
                        int place,
                        BigDecimal price,
                        boolean isPurchased,
-                       OffsetDateTime timeOfPurchase,
+                       LocalDateTime timeOfPurchase,
                        int visitorId) {
         Ticket ticket = new Ticket();
         ticket.setSessionId(sessionId);
@@ -74,7 +74,7 @@ public class TicketsService {
         ticketsRepository.update(id, ticketWithUpdatedPrice);
     }
 
-    public void buyTicket(int id, OffsetDateTime timeOfPurchase, int visitorId) {
+    public void buyTicket(int id, LocalDateTime timeOfPurchase, int visitorId) {
         Ticket ticket = ticketsRepository.findById(id)
                 .orElseThrow(TicketNotFoundException::new);
 
@@ -86,7 +86,7 @@ public class TicketsService {
                 .orElseThrow(UserNotFoundException::new);
 
         ticket.setIsPurchased(true);
-        ticket.setTimeOfPurchase(OffsetDateTime.now());
+        ticket.setTimeOfPurchase(LocalDateTime.now());
         ticket.setVisitorId(visitorId);
     }
 

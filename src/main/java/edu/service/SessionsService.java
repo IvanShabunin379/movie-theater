@@ -12,7 +12,7 @@ import edu.service.exception.session.SessionNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 import java.math.BigDecimal;
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -21,7 +21,7 @@ public class SessionsService {
     private final TicketsRepository ticketsRepository;
     private final AuditoriumsRepository auditoriumsRepository;
 
-    public void create(int movieId, int auditoriumId, OffsetDateTime startTime, BigDecimal ticketPrice) {
+    public void create(int movieId, int auditoriumId, LocalDateTime startTime, BigDecimal ticketPrice) {
         Session session = new Session();
         session.setMovieId(movieId);
         session.setAuditoriumId(auditoriumId);
@@ -62,7 +62,7 @@ public class SessionsService {
         return sessionsRepository.findByMovie(movieId);
     }
 
-    public List<Session> listAllMovieSessionsForTimePeriod(int movieId, OffsetDateTime periodStart, OffsetDateTime periodEnd) {
+    public List<Session> listAllMovieSessionsForTimePeriod(int movieId, LocalDateTime periodStart, LocalDateTime periodEnd) {
         return sessionsRepository.findByMovieBetweenTimestamps(movieId, periodStart, periodEnd);
     }
 }
