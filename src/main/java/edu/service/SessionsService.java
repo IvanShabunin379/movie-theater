@@ -1,6 +1,7 @@
 package edu.service;
 
 import edu.domain.model.Auditorium;
+import edu.domain.model.Movie;
 import edu.domain.model.Session;
 import edu.domain.model.Ticket;
 import edu.domain.repository.AuditoriumsRepository;
@@ -13,7 +14,10 @@ import lombok.RequiredArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 @RequiredArgsConstructor
 public class SessionsService {
@@ -52,7 +56,18 @@ public class SessionsService {
         }
     }
 
+    public Session get(int id) {
+        return sessionsRepository.findById(id)
+                .orElseThrow(SessionNotFoundException::new);
+    }
+
     public void remove(int id) {
+        Session removedSession = sessionsRepository.findById(id)
+                .orElseThrow(SessionNotFoundException::new);
+
+        List<Ticket> removedTickets = ticketsRepository.findBySession(id);
+        removedTickets.forEach(ticket -> ticketsRepository.delete(ticket.getId()));
+
         if (!sessionsRepository.delete(id)) {
             throw new SessionNotFoundException();
         }
@@ -62,7 +77,29 @@ public class SessionsService {
         return sessionsRepository.findByMovie(movieId);
     }
 
-    public List<Session> listAllMovieSessionsForTimePeriod(int movieId, LocalDateTime periodStart, LocalDateTime periodEnd) {
+    public List<Session> listAllMovieSessionsForTimePeriodByMovie(int movieId, LocalDateTime periodStart, LocalDateTime periodEnd) {
         return sessionsRepository.findByMovieBetweenTimestamps(movieId, periodStart, periodEnd);
+    }
+
+    public Map<Movie, List<Session>> listAllMovieSessionsForTimePeriod(
+            List<Movie> movies,
+            LocalDateTime periodStart,
+            LocalDateTime periodEnd
+    ) {
+        Map<Movie, List<Session>> result = new TreeMap<>(
+                Comparator.comparingInt(Movie::getYear).reversed()
+                        .thenComparing(Movie::getName)
+        );
+
+        for (Movie movie : movies) {
+            List<Session> sessions = listAllMovieSessionsForTimePeriodByMovie(
+                    movie.getId(),
+                    periodStart,
+                    periodEnd
+            );
+            result.put(movie, sessions);
+        }
+
+        return result;
     }
 }
