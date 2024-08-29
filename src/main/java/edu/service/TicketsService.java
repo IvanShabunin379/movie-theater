@@ -86,8 +86,15 @@ public class TicketsService {
                 .orElseThrow(UserNotFoundException::new);
 
         ticket.setIsPurchased(true);
-        ticket.setTimeOfPurchase(LocalDateTime.now());
+        ticket.setTimeOfPurchase(timeOfPurchase);
         ticket.setVisitorId(visitorId);
+
+        ticketsRepository.update(ticket.getId(), ticket);
+    }
+
+    public Ticket getTicketBySessionAndSeat(int sessionId, int row, int place) {
+        return ticketsRepository.findBySessionAndRowAndPlace(sessionId, row, place)
+                .orElseThrow(TicketNotFoundException::new);
     }
 
     public void handOverTicketToBoxOffice(int id) {
@@ -101,6 +108,15 @@ public class TicketsService {
         ticket.setIsPurchased(false);
         ticket.setTimeOfPurchase(null);
         ticket.setVisitorId(null);
+
+        ticketsRepository.update(ticket.getId(), ticket);
+    }
+
+    public List<Ticket> getSessionTickets(int sessionId) {
+        Session session = sessionsRepository.findById(sessionId)
+                .orElseThrow(SessionNotFoundException::new);
+
+        return ticketsRepository.findBySession(sessionId);
     }
 
     private void validateTicketAttributes(Ticket ticket) {

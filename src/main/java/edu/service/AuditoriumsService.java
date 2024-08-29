@@ -37,7 +37,7 @@ public class AuditoriumsService {
         Session session = sessionsRepository.findById(sessionId)
                 .orElseThrow(SessionNotFoundException::new);
 
-        return auditoriumsRepository.findById(session.getId())
+        return auditoriumsRepository.findById(session.getAuditoriumId())
                 .orElseThrow(AuditoriumNotFoundException::new);
     }
 
@@ -58,7 +58,7 @@ public class AuditoriumsService {
         }
 
         if (numberOfRows <= 0 || numberOfSeatsInRow <= 0) {
-            throw new IllegalArgumentException("Auditorium Number of rows and number of seats in row should be positive.");
+            throw new IllegalArgumentException("Auditorium number of rows and number of seats in row should be positive.");
         }
 
         int totalNumberOfSeats = numberOfRows * numberOfSeatsInRow;
