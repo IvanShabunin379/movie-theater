@@ -1,5 +1,8 @@
 package edu.domain.model;
 
+import lombok.Getter;
+
+@Getter
 public enum MovieGenre {
     ACTION("боевик"),
     ADVENTURE("приключения"),
@@ -28,7 +31,4 @@ public enum MovieGenre {
         this.russianName = russianName;
     }
 
-    public String getRussianName() {
-        return russianName;
-    }
 }
