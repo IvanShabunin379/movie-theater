@@ -29,7 +29,7 @@ public class DirectorsService {
 
     public void remove(int id) {
         if (!directorsRepository.delete(id)) {
-            throw new DirectorNotFoundException();
+            throw new DirectorAlreadyExistsException();
         }
     }
 
