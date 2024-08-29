@@ -4,16 +4,19 @@ import edu.database.ConnectionFactory;
 import edu.domain.model.Director;
 import edu.domain.repository.exception.DataAccessException;
 import edu.domain.repository.mapper.DirectorMapper;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@RequiredArgsConstructor
 public class DirectorsRepository {
     private static final String FIND_ALL_TEMPLATE = "SELECT id, name FROM directors";
     private static final String FIND_BY_ID_TEMPLATE = "SELECT id, name FROM directors WHERE id = ?";
@@ -24,10 +27,6 @@ public class DirectorsRepository {
 
     private Connection connection;
     private final DirectorMapper directorMapper;
-
-    public DirectorsRepository() {
-        directorMapper = new DirectorMapper();
-    }
 
     public List<Director> findAll() {
         connection = ConnectionFactory.getConnection();
@@ -101,12 +100,10 @@ public class DirectorsRepository {
             preparedStatement.setString(1, director.getName());
 
             return preparedStatement.executeUpdate() == 1;
+        } catch (SQLIntegrityConstraintViolationException e) {
+            return false;
         } catch (SQLException e) {
-            if (e.getSQLState().equals("23000")) {
-                return false;
-            } else {
-                throw new DataAccessException(e);
-            }
+            throw new DataAccessException(e);
         }
     }
 

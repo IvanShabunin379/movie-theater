@@ -5,18 +5,21 @@ import edu.database.ConnectionFactory;
 import edu.domain.model.Session;
 import edu.domain.repository.exception.DataAccessException;
 import edu.domain.repository.mapper.SessionMapper;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@RequiredArgsConstructor
 public class SessionsRepository {
     private static final String FIND_ALL_TEMPLATE = "SELECT id, movie_id, auditorium_id, start_time FROM sessions";
     private static final String FIND_BY_ID_TEMPLATE = "SELECT id, movie_id, auditorium_id, start_time FROM sessions WHERE id = ?";
@@ -74,10 +77,6 @@ public class SessionsRepository {
 
     private Connection connection;
     private final SessionMapper sessionMapper;
-
-    public SessionsRepository() {
-        sessionMapper = new SessionMapper();
-    }
 
     public List<Session> findAll() {
         connection = ConnectionFactory.getConnection();
@@ -247,12 +246,10 @@ public class SessionsRepository {
             preparedStatement.setTimestamp(3, Timestamp.valueOf(session.getStartTime()));
 
             return preparedStatement.executeUpdate() == 1;
+        } catch (SQLIntegrityConstraintViolationException e) {
+            return false;
         } catch (SQLException e) {
-            if (e.getSQLState().equals("23000")) {
-                return false;
-            } else {
-                throw new DataAccessException(e);
-            }
+            throw new DataAccessException(e);
         }
     }
 

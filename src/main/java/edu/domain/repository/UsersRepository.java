@@ -4,16 +4,19 @@ import edu.database.ConnectionFactory;
 import edu.domain.model.User;
 import edu.domain.repository.exception.DataAccessException;
 import edu.domain.repository.mapper.UserMapper;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@RequiredArgsConstructor
 public class UsersRepository {
     private static final String FIND_ALL_TEMPLATE = "SELECT id, name, email, password_hash FROM users";
     private static final String FIND_BY_ID_TEMPLATE = "SELECT id, name, email, password_hash FROM users WHERE id = ?";
@@ -34,10 +37,6 @@ public class UsersRepository {
 
     private Connection connection;
     private final UserMapper userMapper;
-
-    public UsersRepository() {
-        userMapper = new UserMapper();
-    }
 
     public List<User> findAll() {
         connection = ConnectionFactory.getConnection();
@@ -88,7 +87,7 @@ public class UsersRepository {
 
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(FIND_BY_EMAIL_TEMPLATE);
-            preparedStatement.setString(1, "email");
+            preparedStatement.setString(1, email);
 
             ResultSet resultSet = preparedStatement.executeQuery();
 
@@ -113,12 +112,10 @@ public class UsersRepository {
             preparedStatement.setString(3, user.getPasswordHash());
 
             return preparedStatement.executeUpdate() == 1;
+        } catch (SQLIntegrityConstraintViolationException e) {
+            return false;
         } catch (SQLException e) {
-            if (e.getSQLState().equals("23000")) {
-                return false;
-            } else {
-                throw new DataAccessException(e);
-            }
+            throw new DataAccessException(e);
         }
     }
 

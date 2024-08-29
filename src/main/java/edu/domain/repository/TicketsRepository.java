@@ -4,17 +4,20 @@ import edu.database.ConnectionFactory;
 import edu.domain.model.Ticket;
 import edu.domain.repository.exception.DataAccessException;
 import edu.domain.repository.mapper.TicketMapper;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@RequiredArgsConstructor
 public class TicketsRepository {
     private static final String FIND_ALL_TEMPLATE = """
             SELECT id,
@@ -126,10 +129,6 @@ public class TicketsRepository {
 
     private Connection connection;
     private final TicketMapper ticketMapper;
-
-    public TicketsRepository() {
-        ticketMapper = new TicketMapper();
-    }
 
     public List<Ticket> findAll() {
         connection = ConnectionFactory.getConnection();
@@ -295,12 +294,10 @@ public class TicketsRepository {
             preparedStatement.setInt(7, ticket.getVisitorId());
 
             return preparedStatement.executeUpdate() == 1;
+        } catch (SQLIntegrityConstraintViolationException e) {
+            return false;
         } catch (SQLException e) {
-            if (e.getSQLState().equals("23000")) {
-                return false;
-            } else {
-                throw new DataAccessException(e);
-            }
+            throw new DataAccessException(e);
         }
     }
 
