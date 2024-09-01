@@ -294,10 +294,8 @@ public class TicketsRepository {
             preparedStatement.setInt(7, ticket.getVisitorId());
 
             return preparedStatement.executeUpdate() == 1;
-        } catch (SQLIntegrityConstraintViolationException e) {
-            return false;
         } catch (SQLException e) {
-            throw new DataAccessException(e);
+            return false;
         }
     }
 

@@ -112,10 +112,8 @@ public class UsersRepository {
             preparedStatement.setString(3, user.getPasswordHash());
 
             return preparedStatement.executeUpdate() == 1;
-        } catch (SQLIntegrityConstraintViolationException e) {
-            return false;
         } catch (SQLException e) {
-            throw new DataAccessException(e);
+            return false;
         }
     }
 

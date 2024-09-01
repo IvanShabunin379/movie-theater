@@ -100,10 +100,8 @@ public class DirectorsRepository {
             preparedStatement.setString(1, director.getName());
 
             return preparedStatement.executeUpdate() == 1;
-        } catch (SQLIntegrityConstraintViolationException e) {
-            return false;
         } catch (SQLException e) {
-            throw new DataAccessException(e);
+            return false;
         }
     }
 

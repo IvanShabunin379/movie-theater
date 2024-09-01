@@ -107,10 +107,8 @@ public class AuditoriumsRepository {
             preparedStatement.setBoolean(5, auditorium.getIsVip());
 
             return preparedStatement.executeUpdate() == 1;
-        } catch (SQLIntegrityConstraintViolationException e) {
-            return false;
         } catch (SQLException e) {
-            throw new DataAccessException(e);
+            return false;
         }
     }
 

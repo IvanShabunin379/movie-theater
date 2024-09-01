@@ -205,10 +205,8 @@ public class MoviesRepository {
             preparedStatement.setBoolean(9, movie.getIsCurrentlyAtBoxOffice());
 
             return preparedStatement.executeUpdate() == 1;
-        } catch (SQLIntegrityConstraintViolationException e) {
-            return false;
         } catch (SQLException e) {
-            throw new DataAccessException(e);
+            return false;
         }
     }
 

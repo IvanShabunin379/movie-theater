@@ -246,10 +246,8 @@ public class SessionsRepository {
             preparedStatement.setTimestamp(3, Timestamp.valueOf(session.getStartTime()));
 
             return preparedStatement.executeUpdate() == 1;
-        } catch (SQLIntegrityConstraintViolationException e) {
-            return false;
         } catch (SQLException e) {
-            throw new DataAccessException(e);
+            return false;
         }
     }
 
