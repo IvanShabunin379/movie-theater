@@ -6,12 +6,13 @@ import edu.domain.repository.exception.DataAccessException;
 import edu.domain.repository.mapper.TicketMapper;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +20,7 @@ import java.util.Optional;
 
 @RequiredArgsConstructor
 public class TicketsRepository {
+    private static final Logger logger = LoggerFactory.getLogger(TicketsRepository.class);
     private static final String FIND_ALL_TEMPLATE = """
             SELECT id,
                    session_id,
@@ -144,6 +146,7 @@ public class TicketsRepository {
                 tickets.add(ticket);
             }
         } catch (SQLException e) {
+            logger.error(e.getMessage());
             throw new DataAccessException(e);
         }
 
@@ -166,6 +169,7 @@ public class TicketsRepository {
                 tickets.add(ticket);
             }
         } catch (SQLException e) {
+            logger.error(e.getMessage());
             throw new DataAccessException(e);
         }
 
@@ -186,6 +190,7 @@ public class TicketsRepository {
                 tickets.add(ticket);
             }
         } catch (SQLException e) {
+            logger.error(e.getMessage());
             throw new DataAccessException(e);
         }
 
@@ -206,6 +211,7 @@ public class TicketsRepository {
                 tickets.add(ticket);
             }
         } catch (SQLException e) {
+            logger.error(e.getMessage());
             throw new DataAccessException(e);
         }
 
@@ -228,6 +234,7 @@ public class TicketsRepository {
                 tickets.add(ticket);
             }
         } catch (SQLException e) {
+            logger.error(e.getMessage());
             throw new DataAccessException(e);
         }
 
@@ -250,6 +257,7 @@ public class TicketsRepository {
                 result = Optional.of(ticket);
             }
         } catch (SQLException e) {
+            logger.error(e.getMessage());
             throw new DataAccessException(e);
         }
 
@@ -274,6 +282,7 @@ public class TicketsRepository {
                 result = Optional.of(ticket);
             }
         } catch (SQLException e) {
+            logger.error(e.getMessage());
             throw new DataAccessException(e);
         }
 
@@ -295,6 +304,7 @@ public class TicketsRepository {
 
             return preparedStatement.executeUpdate() == 1;
         } catch (SQLException e) {
+            logger.error(e.getMessage());
             return false;
         }
     }
@@ -316,6 +326,7 @@ public class TicketsRepository {
 
             return preparedStatement.executeUpdate() == 1;
         } catch (SQLException e) {
+            logger.error(e.getMessage());
             throw new DataAccessException(e);
         }
     }
@@ -329,6 +340,7 @@ public class TicketsRepository {
 
             return preparedStatement.executeUpdate() == 1;
         } catch (SQLException e) {
+            logger.error(e.getMessage());
             throw new DataAccessException(e);
         }
     }

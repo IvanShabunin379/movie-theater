@@ -7,12 +7,13 @@ import edu.domain.repository.exception.DataAccessException;
 import edu.domain.repository.mapper.SessionMapper;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -21,6 +22,7 @@ import java.util.Optional;
 
 @RequiredArgsConstructor
 public class SessionsRepository {
+    private static final Logger logger = LoggerFactory.getLogger(SessionsRepository.class);
     private static final String FIND_ALL_TEMPLATE = "SELECT id, movie_id, auditorium_id, start_time FROM sessions";
     private static final String FIND_BY_ID_TEMPLATE = "SELECT id, movie_id, auditorium_id, start_time FROM sessions WHERE id = ?";
     private static final String FIND_BY_MOVIE_AND_AUDITORIUM_AND_START_TIME_TEMPLATE = """
@@ -92,6 +94,7 @@ public class SessionsRepository {
                 sessions.add(session);
             }
         } catch (SQLException e) {
+            logger.error(e.getMessage());
             throw new DataAccessException(e);
         }
 
@@ -114,6 +117,7 @@ public class SessionsRepository {
                 sessions.add(session);
             }
         } catch (SQLException e) {
+            logger.error(e.getMessage());
             throw new DataAccessException(e);
         }
 
@@ -136,6 +140,7 @@ public class SessionsRepository {
                 sessions.add(session);
             }
         } catch (SQLException e) {
+            logger.error(e.getMessage());
             throw new DataAccessException(e);
         }
 
@@ -159,6 +164,7 @@ public class SessionsRepository {
                 sessions.add(session);
             }
         } catch (SQLException e) {
+            logger.error(e.getMessage());
             throw new DataAccessException(e);
         }
 
@@ -183,6 +189,7 @@ public class SessionsRepository {
                 sessions.add(session);
             }
         } catch (SQLException e) {
+            logger.error(e.getMessage());
             throw new DataAccessException(e);
         }
 
@@ -205,6 +212,7 @@ public class SessionsRepository {
                 result = Optional.of(session);
             }
         } catch (SQLException e) {
+            logger.error(e.getMessage());
             throw new DataAccessException(e);
         }
 
@@ -229,6 +237,7 @@ public class SessionsRepository {
                 result = Optional.of(session);
             }
         } catch (SQLException e) {
+            logger.error(e.getMessage());
             throw new DataAccessException(e);
         }
 
@@ -247,6 +256,7 @@ public class SessionsRepository {
 
             return preparedStatement.executeUpdate() == 1;
         } catch (SQLException e) {
+            logger.error(e.getMessage());
             return false;
         }
     }
@@ -264,6 +274,7 @@ public class SessionsRepository {
 
             return preparedStatement.executeUpdate() == 1;
         } catch (SQLException e) {
+            logger.error(e.getMessage());
             throw new DataAccessException(e);
         }
     }
@@ -277,6 +288,7 @@ public class SessionsRepository {
 
             return preparedStatement.executeUpdate() == 1;
         } catch (SQLException e) {
+            logger.error(e.getMessage());
             throw new DataAccessException(e);
         }
     }
