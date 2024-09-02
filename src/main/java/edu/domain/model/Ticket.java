@@ -5,7 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
@@ -17,6 +17,6 @@ public class Ticket {
     private Integer place;
     private BigDecimal price;
     private Boolean isPurchased;
-    private OffsetDateTime timeOfPurchase;
+    private LocalDateTime timeOfPurchase;
     private Integer visitorId;
 }

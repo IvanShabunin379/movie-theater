@@ -1,24 +1,34 @@
 package edu.domain.model;
 
+import lombok.Getter;
+
+@Getter
 public enum MovieGenre {
-    ACTION,
-    ADVENTURE,
-    ANIMATED,
-    BIOPIC,
-    CHILDREN,
-    COMEDY,
-    DETECTIVE,
-    DOCUMENTARY,
-    DRAMA,
-    FANTASY,
-    GANGSTER,
-    HISTORICAL,
-    HORROR,
-    MUSICAL,
-    ROMANCE,
-    SCIENCE_FICTION,
-    SPORT,
-    THRILLER,
-    WAR,
-    WESTERN
+    ACTION("боевик"),
+    ADVENTURE("приключения"),
+    ANIMATED("мультфильм"),
+    BIOPIC("биография"),
+    CHILDREN("детский"),
+    COMEDY("комедия"),
+    DETECTIVE("детектив"),
+    DOCUMENTARY("документальный"),
+    DRAMA("драма"),
+    FANTASY("фэнтези"),
+    GANGSTER("гангстерский"),
+    HISTORICAL("исторический"),
+    HORROR("ужасы"),
+    MUSICAL("мюзикл"),
+    ROMANCE("романтика"),
+    SCIENCE_FICTION("научная фантастика"),
+    SPORT("спорт"),
+    THRILLER("триллер"),
+    WAR("военный"),
+    WESTERN("вестерн");
+
+    private final String russianName;
+
+    MovieGenre(String russianName) {
+        this.russianName = russianName;
+    }
+
 }

@@ -18,7 +18,7 @@ import edu.service.exception.user.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 import java.math.BigDecimal;
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -36,7 +36,7 @@ public class TicketsService {
                        int place,
                        BigDecimal price,
                        boolean isPurchased,
-                       OffsetDateTime timeOfPurchase,
+                       LocalDateTime timeOfPurchase,
                        int visitorId) {
         Ticket ticket = new Ticket();
         ticket.setSessionId(sessionId);
@@ -74,7 +74,7 @@ public class TicketsService {
         ticketsRepository.update(id, ticketWithUpdatedPrice);
     }
 
-    public void buyTicket(int id, OffsetDateTime timeOfPurchase, int visitorId) {
+    public void buyTicket(int id, LocalDateTime timeOfPurchase, int visitorId) {
         Ticket ticket = ticketsRepository.findById(id)
                 .orElseThrow(TicketNotFoundException::new);
 
@@ -86,8 +86,15 @@ public class TicketsService {
                 .orElseThrow(UserNotFoundException::new);
 
         ticket.setIsPurchased(true);
-        ticket.setTimeOfPurchase(OffsetDateTime.now());
+        ticket.setTimeOfPurchase(timeOfPurchase);
         ticket.setVisitorId(visitorId);
+
+        ticketsRepository.update(ticket.getId(), ticket);
+    }
+
+    public Ticket getTicketBySessionAndSeat(int sessionId, int row, int place) {
+        return ticketsRepository.findBySessionAndRowAndPlace(sessionId, row, place)
+                .orElseThrow(TicketNotFoundException::new);
     }
 
     public void handOverTicketToBoxOffice(int id) {
@@ -101,6 +108,15 @@ public class TicketsService {
         ticket.setIsPurchased(false);
         ticket.setTimeOfPurchase(null);
         ticket.setVisitorId(null);
+
+        ticketsRepository.update(ticket.getId(), ticket);
+    }
+
+    public List<Ticket> getSessionTickets(int sessionId) {
+        Session session = sessionsRepository.findById(sessionId)
+                .orElseThrow(SessionNotFoundException::new);
+
+        return ticketsRepository.findBySession(sessionId);
     }
 
     private void validateTicketAttributes(Ticket ticket) {

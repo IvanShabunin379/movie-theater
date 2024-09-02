@@ -4,9 +4,11 @@ import edu.domain.model.Ticket;
 import edu.domain.model.User;
 import edu.domain.repository.TicketsRepository;
 import edu.domain.repository.UsersRepository;
+import edu.pw_hashing.PasswordHasher;
 import edu.service.exception.ticket.TicketNotFoundException;
 import edu.service.exception.user.UserAlreadyExistsException;
 import edu.service.exception.user.UserNotFoundException;
+import edu.service.exception.user.WrongPasswordException;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.validator.routines.EmailValidator;
 
@@ -16,16 +18,35 @@ public class UsersService {
 
     private final UsersRepository usersRepository;
     private final TicketsRepository ticketsRepository;
+    private final PasswordHasher passwordHasher;
 
-    public void register(String name, String email, String passwordHash) {
+    public User register(String name, String email, String password) {
+        validateEmailAndPassword(email, password);
+
         User user = new User();
         user.setName(name);
         user.setEmail(email);
+
+        String passwordHash = passwordHasher.hash(password);
         user.setPasswordHash(passwordHash);
 
         if (!usersRepository.save(user)) {
             throw new UserAlreadyExistsException();
         }
+
+        return usersRepository.findByEmail(email)
+                .orElseThrow(UserNotFoundException::new);
+    }
+
+    public User login(String email, String password) {
+        User identifiedUser = usersRepository.findByEmail(email)
+                .orElseThrow(UserNotFoundException::new);
+
+        if (!passwordHasher.check(password, identifiedUser.getPasswordHash())) {
+            throw new WrongPasswordException();
+        }
+
+        return identifiedUser;
     }
 
     public void unregister(int id) {
@@ -79,7 +100,7 @@ public class UsersService {
 
     private void validatePassword(String password) {
         if (password == null || password.length() < MIN_PASSWORD_LEN) {
-            throw new IllegalArgumentException("Password len should be greater than 5");
+            throw new IllegalArgumentException("Password len should be greater than 5.");
         }
     }
 

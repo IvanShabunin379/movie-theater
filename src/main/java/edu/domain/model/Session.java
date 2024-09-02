@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
@@ -13,5 +13,5 @@ public class Session {
     private Integer id;
     private Integer movieId;
     private Integer auditoriumId;
-    private OffsetDateTime startTime;
+    private LocalDateTime startTime;
 }

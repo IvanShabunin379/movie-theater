@@ -4,8 +4,7 @@ import edu.domain.model.Ticket;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
+import java.time.LocalDateTime;
 
 public class TicketMapper implements RowMapper<Ticket> {
     @Override
@@ -17,7 +16,7 @@ public class TicketMapper implements RowMapper<Ticket> {
                 resultSet.getInt("place"),
                 resultSet.getBigDecimal("price"),
                 resultSet.getBoolean("is_purchased"),
-                OffsetDateTime.ofInstant(resultSet.getTimestamp("time_of_purchase").toInstant(), ZoneOffset.UTC),
+                resultSet.getObject("time_of_purchase", LocalDateTime.class),
                 resultSet.getInt("visitor_id")
         );
     }

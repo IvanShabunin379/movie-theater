@@ -4,8 +4,6 @@ import edu.domain.model.Session;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
 
 public class SessionMapper implements RowMapper<Session> {
     @Override
@@ -14,7 +12,7 @@ public class SessionMapper implements RowMapper<Session> {
                 resultSet.getInt("id"),
                 resultSet.getInt("movie_id"),
                 resultSet.getInt("auditorium_id"),
-                OffsetDateTime.ofInstant(resultSet.getTimestamp("start_time").toInstant(), ZoneOffset.UTC)
+                resultSet.getTimestamp("start_time").toLocalDateTime()
         );
     }
 }

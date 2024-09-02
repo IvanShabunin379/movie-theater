@@ -4,16 +4,19 @@ import edu.database.ConnectionFactory;
 import edu.domain.model.Auditorium;
 import edu.domain.repository.exception.DataAccessException;
 import edu.domain.repository.mapper.AuditoriumMapper;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@RequiredArgsConstructor
 public class AuditoriumsRepository {
     private static final String FIND_ALL_TEMPLATE = """
             SELECT id,
@@ -49,10 +52,6 @@ public class AuditoriumsRepository {
 
     private Connection connection;
     private final AuditoriumMapper auditoriumMapper;
-
-    public AuditoriumsRepository() {
-        auditoriumMapper = new AuditoriumMapper();
-    }
 
     public List<Auditorium> findAll() {
         connection = ConnectionFactory.getConnection();
@@ -109,11 +108,7 @@ public class AuditoriumsRepository {
 
             return preparedStatement.executeUpdate() == 1;
         } catch (SQLException e) {
-            if (e.getSQLState().equals("23000")) {
-                return false;
-            } else {
-                throw new DataAccessException(e);
-            }
+            return false;
         }
     }
 

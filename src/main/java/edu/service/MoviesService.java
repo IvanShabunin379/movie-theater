@@ -2,9 +2,12 @@ package edu.service;
 
 import edu.domain.model.Movie;
 import edu.domain.model.MovieGenre;
+import edu.domain.model.Session;
 import edu.domain.repository.MoviesRepository;
+import edu.domain.repository.SessionsRepository;
 import edu.service.exception.movie.MovieAlreadyExistsException;
 import edu.service.exception.movie.MovieNotFoundException;
+import edu.service.exception.session.SessionNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 import java.time.Year;
@@ -17,6 +20,7 @@ public class MoviesService {
     private static final Integer MAX_DURATION = 1000;
 
     private final MoviesRepository moviesRepository;
+    private final SessionsRepository sessionsRepository;
 
     public void add(String name,
                     int year,
@@ -53,6 +57,14 @@ public class MoviesService {
         if (!moviesRepository.delete(id)) {
             throw new MovieNotFoundException();
         }
+    }
+
+    public Movie getSessionMovie(int sessionId) {
+        Session session = sessionsRepository.findById(sessionId)
+                .orElseThrow(SessionNotFoundException::new);
+
+        return moviesRepository.findById(session.getMovieId())
+                .orElseThrow(MovieNotFoundException::new);
     }
 
     public List<Movie> listAllAtBoxOffice() {
@@ -102,12 +114,12 @@ public class MoviesService {
 
     private void validateMovieAttributes(int year, int duration) {
         if (year < 1895 || Year.of(year).isAfter(Year.now())) {
-            throw new IllegalArgumentException("Movie year should be between " + MIN_YEAR +" and current year.");
+            throw new IllegalArgumentException("Movie year should be between " + MIN_YEAR + " and current year.");
         }
 
         if (duration < 5 || duration > 1000) {
             throw new IllegalArgumentException("Movie duration should be between "
-                    + MIN_DURATION +" and " + MAX_DURATION + " minutes.");
+                    + MIN_DURATION + " and " + MAX_DURATION + " minutes.");
         }
     }
 }
