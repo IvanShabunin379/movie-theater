@@ -5,21 +5,42 @@ import edu.domain.model.Movie;
 import edu.domain.repository.exception.DataAccessException;
 import edu.domain.repository.mapper.MovieMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
+@Log4j2
 public class MoviesRepository {
-    private static final Logger logger = LoggerFactory.getLogger(MoviesRepository.class);
+    private static final String SAVE_TEMPLATE = """
+            INSERT INTO movies(name,
+                               year,
+                               country_id,
+                               poster_path,
+                               genre,
+                               duration,
+                               description,
+                               director_id,
+                               is_currently_at_box_office)
+            VALUES (?, ?, ?, ?, ?::movie_genre, ?, ?, ?, ?)
+            """;
+    private static final String SAVE_BY_ID_TEMPLATE = """
+            INSERT INTO movies(id,
+                               name,
+                               year,
+                               country_id,
+                               poster_path,
+                               genre,
+                               duration,
+                               description,
+                               director_id,
+                               is_currently_at_box_office)
+            VALUES (?, ?, ?, ?, ?, ?::movie_genre, ?, ?, ?, ?)
+            """;
     private static final String FIND_ALL_TEMPLATE = """
             SELECT id,
                    name,
@@ -75,25 +96,13 @@ public class MoviesRepository {
             FROM movies
             WHERE name = ? AND director_id = ? AND year = ?
             """;
-    private static final String SAVE_TEMPLATE = """
-            INSERT INTO movies(name,
-                               year,
-                               country_id,
-                               poster_path,
-                               genre,
-                               duration,
-                               description,
-                               director_id,
-                               is_currently_at_box_office)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """;
     private static final String UPDATE_TEMPLATE = """
             UPDATE movies
             SET name = ?,
                 year = ?,
                 country_id = ?,
                 poster_path = ?,
-                genre = ?,
+                genre = ?::movie_genre,
                 duration = ?,
                 description = ?,
                 director_id = ?,
@@ -104,6 +113,62 @@ public class MoviesRepository {
 
     private Connection connection;
     private final MovieMapper movieMapper;
+
+    public boolean save(@NotNull Movie movie) {
+        connection = ConnectionFactory.getConnection();
+
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(SAVE_TEMPLATE);
+            preparedStatement.setString(1, movie.getName());
+            preparedStatement.setInt(2, movie.getYear());
+            preparedStatement.setInt(3, movie.getCountryId());
+            preparedStatement.setString(4, movie.getPosterPath());
+            if (movie.getGenre() != null){
+                preparedStatement.setString(5, String.valueOf(movie.getGenre()).toLowerCase());
+            } else {
+                preparedStatement.setNull(5, Types.OTHER);
+            }
+            //preparedStatement.setObject(5, movie.getGenre());
+            preparedStatement.setInt(6, movie.getDuration());
+            preparedStatement.setString(7, movie.getDescription());
+            preparedStatement.setInt(8, movie.getDirectorId());
+            preparedStatement.setBoolean(9, movie.getIsCurrentlyAtBoxOffice());
+
+            return preparedStatement.executeUpdate() == 1;
+        } catch (SQLException e) {
+            log.error(e.getMessage());
+            return false;
+        }
+    }
+
+    public void saveById(@NotNull Movie movie) {
+        connection = ConnectionFactory.getConnection();
+
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(SAVE_BY_ID_TEMPLATE);
+
+            preparedStatement.setInt(1, movie.getId());
+            preparedStatement.setString(2, movie.getName());
+            preparedStatement.setInt(3, movie.getYear());
+            preparedStatement.setInt(4, movie.getCountryId());
+            preparedStatement.setString(5, movie.getPosterPath());
+            if (movie.getGenre() != null){
+                preparedStatement.setString(6, String.valueOf(movie.getGenre()).toLowerCase());
+            } else {
+                preparedStatement.setNull(6, Types.OTHER);
+            }
+            //preparedStatement.setObject(6, movie.getGenre());
+            preparedStatement.setInt(7, movie.getDuration());
+            preparedStatement.setString(8, movie.getDescription());
+            preparedStatement.setInt(9, movie.getDirectorId());
+            preparedStatement.setBoolean(10, movie.getIsCurrentlyAtBoxOffice());
+
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            log.error(e.getMessage());
+            throw new DataAccessException(e);
+        }
+    }
 
     public List<Movie> findAll() {
         connection = ConnectionFactory.getConnection();
@@ -119,7 +184,7 @@ public class MoviesRepository {
                 movies.add(movie);
             }
         } catch (SQLException e) {
-            logger.error(e.getMessage());
+            log.error(e.getMessage());
             throw new DataAccessException(e);
         }
 
@@ -140,7 +205,7 @@ public class MoviesRepository {
                 movies.add(movie);
             }
         } catch (SQLException e) {
-            logger.error(e.getMessage());
+            log.error(e.getMessage());
             throw new DataAccessException(e);
         }
 
@@ -163,7 +228,7 @@ public class MoviesRepository {
                 result = Optional.of(movie);
             }
         } catch (SQLException e) {
-            logger.error(e.getMessage());
+            log.error(e.getMessage());
             throw new DataAccessException(e);
         }
 
@@ -188,33 +253,11 @@ public class MoviesRepository {
                 result = Optional.of(movie);
             }
         } catch (SQLException e) {
-            logger.error(e.getMessage());
+            log.error(e.getMessage());
             throw new DataAccessException(e);
         }
 
         return result;
-    }
-
-    public boolean save(@NotNull Movie movie) {
-        connection = ConnectionFactory.getConnection();
-
-        try {
-            PreparedStatement preparedStatement = connection.prepareStatement(SAVE_TEMPLATE);
-            preparedStatement.setString(1, movie.getName());
-            preparedStatement.setInt(2, movie.getYear());
-            preparedStatement.setInt(3, movie.getCountryId());
-            preparedStatement.setString(4, movie.getPosterPath());
-            preparedStatement.setObject(5, movie.getGenre());
-            preparedStatement.setInt(6, movie.getDuration());
-            preparedStatement.setString(7, movie.getDescription());
-            preparedStatement.setInt(8, movie.getDirectorId());
-            preparedStatement.setBoolean(9, movie.getIsCurrentlyAtBoxOffice());
-
-            return preparedStatement.executeUpdate() == 1;
-        } catch (SQLException e) {
-            logger.error(e.getMessage());
-            return false;
-        }
     }
 
     public boolean update(int id, @NotNull Movie updatedMovie) {
@@ -227,7 +270,7 @@ public class MoviesRepository {
             preparedStatement.setInt(2, updatedMovie.getYear());
             preparedStatement.setInt(3, updatedMovie.getCountryId());
             preparedStatement.setString(4, updatedMovie.getPosterPath());
-            preparedStatement.setObject(5, updatedMovie.getGenre());
+            preparedStatement.setString(5, updatedMovie.getGenre().name().toLowerCase());
             preparedStatement.setInt(6, updatedMovie.getDuration());
             preparedStatement.setString(7, updatedMovie.getDescription());
             preparedStatement.setInt(8, updatedMovie.getDirectorId());
@@ -236,7 +279,7 @@ public class MoviesRepository {
 
             return preparedStatement.executeUpdate() == 1;
         } catch (SQLException e) {
-            logger.error(e.getMessage());
+            log.error(e.getMessage());
             throw new DataAccessException(e);
         }
     }
@@ -250,7 +293,7 @@ public class MoviesRepository {
 
             return preparedStatement.executeUpdate() == 1;
         } catch (SQLException e) {
-            logger.error(e.getMessage());
+            log.error(e.getMessage());
             throw new DataAccessException(e);
         }
     }

@@ -5,9 +5,8 @@ import edu.domain.model.Auditorium;
 import edu.domain.repository.exception.DataAccessException;
 import edu.domain.repository.mapper.AuditoriumMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -18,8 +17,12 @@ import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
+@Log4j2
 public class AuditoriumsRepository {
-    private static final Logger logger = LoggerFactory.getLogger(AuditoriumsRepository.class);
+    private static final String SAVE_TEMPLATE = """
+            INSERT INTO auditoriums(id, number_of_rows, number_of_seats_in_row, is_3D, is_VIP)
+            VALUES (?, ?, ?, ?, ?)
+            """;
     private static final String FIND_ALL_TEMPLATE = """
             SELECT id,
                    number_of_rows,
@@ -37,10 +40,6 @@ public class AuditoriumsRepository {
             FROM auditoriums
             WHERE id = ?
             """;
-    private static final String SAVE_TEMPLATE = """
-            INSERT INTO auditoriums(id, number_of_rows, number_of_seats_in_row, is_3D, is_VIP)
-            VALUES (?, ?, ?, ?, ?)
-            """;
     private static final String UPDATE_TEMPLATE = """
             UPDATE auditoriums
             SET id = ?,
@@ -54,6 +53,24 @@ public class AuditoriumsRepository {
 
     private Connection connection;
     private final AuditoriumMapper auditoriumMapper;
+
+    public boolean save(@NotNull Auditorium auditorium) {
+        connection = ConnectionFactory.getConnection();
+
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(SAVE_TEMPLATE);
+            preparedStatement.setInt(1, auditorium.getId());
+            preparedStatement.setInt(2, auditorium.getNumberOfRows());
+            preparedStatement.setInt(3, auditorium.getNumberOfSeatsInRow());
+            preparedStatement.setBoolean(4, auditorium.getIs3d());
+            preparedStatement.setBoolean(5, auditorium.getIsVip());
+
+            return preparedStatement.executeUpdate() == 1;
+        } catch (SQLException e) {
+            log.error(e.getMessage());
+            return false;
+        }
+    }
 
     public List<Auditorium> findAll() {
         connection = ConnectionFactory.getConnection();
@@ -69,7 +86,7 @@ public class AuditoriumsRepository {
                 auditoriums.add(auditorium);
             }
         } catch (SQLException e) {
-            logger.error(e.getMessage());
+            log.error(e.getMessage());
             throw new DataAccessException(e);
         }
 
@@ -92,29 +109,11 @@ public class AuditoriumsRepository {
                 result = Optional.of(auditorium);
             }
         } catch (SQLException e) {
-            logger.error(e.getMessage());
+            log.error(e.getMessage());
             throw new DataAccessException(e);
         }
 
         return result;
-    }
-
-    public boolean save(@NotNull Auditorium auditorium) {
-        connection = ConnectionFactory.getConnection();
-
-        try {
-            PreparedStatement preparedStatement = connection.prepareStatement(SAVE_TEMPLATE);
-            preparedStatement.setInt(1, auditorium.getId());
-            preparedStatement.setInt(2, auditorium.getNumberOfRows());
-            preparedStatement.setInt(3, auditorium.getNumberOfSeatsInRow());
-            preparedStatement.setBoolean(4, auditorium.getIs3d());
-            preparedStatement.setBoolean(5, auditorium.getIsVip());
-
-            return preparedStatement.executeUpdate() == 1;
-        } catch (SQLException e) {
-            logger.error(e.getMessage());
-            return false;
-        }
     }
 
     public boolean update(int id, @NotNull Auditorium updatedAuditorium) {
@@ -132,7 +131,7 @@ public class AuditoriumsRepository {
 
             return preparedStatement.executeUpdate() == 1;
         } catch (SQLException e) {
-            logger.error(e.getMessage());
+            log.error(e.getMessage());
             throw new DataAccessException(e);
         }
     }
@@ -146,7 +145,7 @@ public class AuditoriumsRepository {
 
             return preparedStatement.executeUpdate() == 1;
         } catch (SQLException e) {
-            logger.error(e.getMessage());
+            log.error(e.getMessage());
             throw new DataAccessException(e);
         }
     }

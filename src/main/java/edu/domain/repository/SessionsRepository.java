@@ -6,9 +6,8 @@ import edu.domain.model.Session;
 import edu.domain.repository.exception.DataAccessException;
 import edu.domain.repository.mapper.SessionMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -21,8 +20,10 @@ import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
+@Log4j2
 public class SessionsRepository {
-    private static final Logger logger = LoggerFactory.getLogger(SessionsRepository.class);
+    private static final String SAVE_TEMPLATE = "INSERT INTO sessions(movie_id, auditorium_id, start_time) VALUES (?, ?, ?)";
+    private static final String SAVE_BY_ID_TEMPLATE = "INSERT INTO sessions(id, movie_id, auditorium_id, start_time) VALUES (?, ?, ?, ?)";
     private static final String FIND_ALL_TEMPLATE = "SELECT id, movie_id, auditorium_id, start_time FROM sessions";
     private static final String FIND_BY_ID_TEMPLATE = "SELECT id, movie_id, auditorium_id, start_time FROM sessions WHERE id = ?";
     private static final String FIND_BY_MOVIE_AND_AUDITORIUM_AND_START_TIME_TEMPLATE = """
@@ -66,7 +67,6 @@ public class SessionsRepository {
              FROM sessions
              WHERE start_time BETWEEN ? AND ?
             """;
-    private static final String SAVE_TEMPLATE = "INSERT INTO sessions(movie_id, auditorium_id, start_time) VALUES (?, ?, ?)";
     private static final String UPDATE_TEMPLATE = """
             UPDATE sessions
             SET movie_id = ?,
@@ -79,6 +79,39 @@ public class SessionsRepository {
 
     private Connection connection;
     private final SessionMapper sessionMapper;
+
+    public boolean save(@NotNull Session session) {
+        connection = ConnectionFactory.getConnection();
+
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(SAVE_TEMPLATE);
+            preparedStatement.setInt(1, session.getMovieId());
+            preparedStatement.setInt(2, session.getAuditoriumId());
+            preparedStatement.setTimestamp(3, Timestamp.valueOf(session.getStartTime()));
+
+            return preparedStatement.executeUpdate() == 1;
+        } catch (SQLException e) {
+            log.error(e.getMessage());
+            return false;
+        }
+    }
+
+    public void saveById(@NotNull Session session) {
+        connection = ConnectionFactory.getConnection();
+
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(SAVE_BY_ID_TEMPLATE);
+            preparedStatement.setInt(1, session.getId());
+            preparedStatement.setInt(2, session.getMovieId());
+            preparedStatement.setInt(3, session.getAuditoriumId());
+            preparedStatement.setTimestamp(4, Timestamp.valueOf(session.getStartTime()));
+
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            log.error(e.getMessage());
+            throw new DataAccessException(e);
+        }
+    }
 
     public List<Session> findAll() {
         connection = ConnectionFactory.getConnection();
@@ -94,7 +127,7 @@ public class SessionsRepository {
                 sessions.add(session);
             }
         } catch (SQLException e) {
-            logger.error(e.getMessage());
+            log.error(e.getMessage());
             throw new DataAccessException(e);
         }
 
@@ -117,7 +150,7 @@ public class SessionsRepository {
                 sessions.add(session);
             }
         } catch (SQLException e) {
-            logger.error(e.getMessage());
+            log.error(e.getMessage());
             throw new DataAccessException(e);
         }
 
@@ -140,7 +173,7 @@ public class SessionsRepository {
                 sessions.add(session);
             }
         } catch (SQLException e) {
-            logger.error(e.getMessage());
+            log.error(e.getMessage());
             throw new DataAccessException(e);
         }
 
@@ -164,7 +197,7 @@ public class SessionsRepository {
                 sessions.add(session);
             }
         } catch (SQLException e) {
-            logger.error(e.getMessage());
+            log.error(e.getMessage());
             throw new DataAccessException(e);
         }
 
@@ -189,7 +222,7 @@ public class SessionsRepository {
                 sessions.add(session);
             }
         } catch (SQLException e) {
-            logger.error(e.getMessage());
+            log.error(e.getMessage());
             throw new DataAccessException(e);
         }
 
@@ -212,7 +245,7 @@ public class SessionsRepository {
                 result = Optional.of(session);
             }
         } catch (SQLException e) {
-            logger.error(e.getMessage());
+            log.error(e.getMessage());
             throw new DataAccessException(e);
         }
 
@@ -237,28 +270,11 @@ public class SessionsRepository {
                 result = Optional.of(session);
             }
         } catch (SQLException e) {
-            logger.error(e.getMessage());
+            log.error(e.getMessage());
             throw new DataAccessException(e);
         }
 
         return result;
-    }
-
-    public boolean save(@NotNull Session session) {
-        connection = ConnectionFactory.getConnection();
-
-        try {
-            PreparedStatement preparedStatement = connection.prepareStatement(SAVE_TEMPLATE);
-            preparedStatement.setInt(1, session.getId());
-            preparedStatement.setInt(1, session.getMovieId());
-            preparedStatement.setInt(2, session.getAuditoriumId());
-            preparedStatement.setTimestamp(3, Timestamp.valueOf(session.getStartTime()));
-
-            return preparedStatement.executeUpdate() == 1;
-        } catch (SQLException e) {
-            logger.error(e.getMessage());
-            return false;
-        }
     }
 
     public boolean update(int id, @NotNull Session updatedSession) {
@@ -274,7 +290,7 @@ public class SessionsRepository {
 
             return preparedStatement.executeUpdate() == 1;
         } catch (SQLException e) {
-            logger.error(e.getMessage());
+            log.error(e.getMessage());
             throw new DataAccessException(e);
         }
     }
@@ -288,7 +304,7 @@ public class SessionsRepository {
 
             return preparedStatement.executeUpdate() == 1;
         } catch (SQLException e) {
-            logger.error(e.getMessage());
+            log.error(e.getMessage());
             throw new DataAccessException(e);
         }
     }

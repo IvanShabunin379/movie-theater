@@ -1,14 +1,13 @@
 package edu.domain.repository;
 
 import edu.database.ConnectionFactory;
+import edu.domain.model.Country;
 import edu.domain.model.Director;
 import edu.domain.repository.exception.DataAccessException;
 import edu.domain.repository.mapper.DirectorMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -18,17 +17,46 @@ import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
+@Log4j2
 public class DirectorsRepository {
-    private static final Logger logger = LoggerFactory.getLogger(DirectorsRepository.class);
+    private static final String SAVE_TEMPLATE = "INSERT INTO directors(name) VALUES (?)";
+    private static final String SAVE_BY_ID_TEMPLATE = "INSERT INTO directors(id, name) VALUES (?, ?)";
     private static final String FIND_ALL_TEMPLATE = "SELECT id, name FROM directors";
     private static final String FIND_BY_ID_TEMPLATE = "SELECT id, name FROM directors WHERE id = ?";
     private static final String FIND_BY_NAME_TEMPLATE = "SELECT id, name FROM directors WHERE name = ?";
-    private static final String SAVE_TEMPLATE = "INSERT INTO directors(name) VALUES (?)";
     private static final String UPDATE_TEMPLATE = "UPDATE directors SET name = ? WHERE id = ?";
     private static final String DELETE_TEMPLATE = "DELETE FROM directors WHERE id = ?";
 
     private Connection connection;
     private final DirectorMapper directorMapper;
+
+    public boolean save(@NotNull Director director) {
+        connection = ConnectionFactory.getConnection();
+
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(SAVE_TEMPLATE);
+            preparedStatement.setString(1, director.getName());
+
+            return preparedStatement.executeUpdate() == 1;
+        } catch (SQLException e) {
+            log.error(e.getMessage());
+            return false;
+        }
+    }
+
+    public void saveById(@NotNull Director director) {
+        connection = ConnectionFactory.getConnection();
+
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(SAVE_BY_ID_TEMPLATE);
+            preparedStatement.setInt(1, director.getId());
+            preparedStatement.setString(2, director.getName());
+
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            throw new DataAccessException(e);
+        }
+    }
 
     public List<Director> findAll() {
         connection = ConnectionFactory.getConnection();
@@ -44,7 +72,7 @@ public class DirectorsRepository {
                 directors.add(director);
             }
         } catch (SQLException e) {
-            logger.error(e.getMessage());
+            log.error(e.getMessage());
             throw new DataAccessException(e);
         }
 
@@ -67,7 +95,7 @@ public class DirectorsRepository {
                 result = Optional.of(director);
             }
         } catch (SQLException e) {
-            logger.error(e.getMessage());
+            log.error(e.getMessage());
             throw new DataAccessException(e);
         }
 
@@ -90,25 +118,11 @@ public class DirectorsRepository {
                 result = Optional.of(director);
             }
         } catch (SQLException e) {
-            logger.error(e.getMessage());
+            log.error(e.getMessage());
             throw new DataAccessException(e);
         }
 
         return result;
-    }
-
-    public boolean save(@NotNull Director director) {
-        connection = ConnectionFactory.getConnection();
-
-        try {
-            PreparedStatement preparedStatement = connection.prepareStatement(SAVE_TEMPLATE);
-            preparedStatement.setString(1, director.getName());
-
-            return preparedStatement.executeUpdate() == 1;
-        } catch (SQLException e) {
-            logger.error(e.getMessage());
-            return false;
-        }
     }
 
     public boolean update(int id, @NotNull Director updatedDirector) {
@@ -122,7 +136,7 @@ public class DirectorsRepository {
 
             return preparedStatement.executeUpdate() == 1;
         } catch (SQLException e) {
-            logger.error(e.getMessage());
+            log.error(e.getMessage());
             throw new DataAccessException(e);
         }
     }
@@ -136,7 +150,7 @@ public class DirectorsRepository {
 
             return preparedStatement.executeUpdate() == 1;
         } catch (SQLException e) {
-            logger.error(e.getMessage());
+            log.error(e.getMessage());
             throw new DataAccessException(e);
         }
     }
