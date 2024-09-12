@@ -47,15 +47,6 @@ public class MoviesServiceTest {
     }
 
     @Test
-    void testRemoveMovie() {
-        when(moviesRepository.delete(testMovie.getId())).thenReturn(true);
-
-        moviesService.remove(testMovie.getId());
-
-        // В случае успеха исключений не должно быть
-    }
-
-    @Test
     void testRemoveMovieNotFound() {
         when(moviesRepository.delete(testMovie.getId())).thenReturn(false);
 

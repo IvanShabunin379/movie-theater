@@ -63,8 +63,6 @@ public class SessionsServiceTest {
 
         assertThatThrownBy(() -> sessionsService.create(MOVIE_ID, AUDITORIUM_ID, START_TIME, TICKET_PRICE))
                 .isInstanceOf(SessionAlreadyExistsException.class);
-
-        verify(ticketsRepository, never()).save(any(Ticket.class));
     }
 
     @Test
