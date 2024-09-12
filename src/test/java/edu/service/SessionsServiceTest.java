@@ -1,8 +1,9 @@
 package edu.service;
 
 import edu.domain.model.*;
-import edu.domain.repository.*;
-import edu.service.exception.auditorium.AuditoriumNotFoundException;
+import edu.domain.repository.AuditoriumsRepository;
+import edu.domain.repository.SessionsRepository;
+import edu.domain.repository.TicketsRepository;
 import edu.service.exception.session.SessionAlreadyExistsException;
 import edu.service.exception.session.SessionNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
