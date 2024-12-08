@@ -88,7 +88,8 @@ public class UsersService {
 
         validatePassword(password);
 
-        userWithUpdatedPassword.setPasswordHash(password);
+        String passwordHash = passwordHasher.hash(password);
+        userWithUpdatedPassword.setPasswordHash(passwordHash);
 
         usersRepository.update(id, userWithUpdatedPassword);
     }

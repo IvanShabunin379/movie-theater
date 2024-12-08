@@ -11,21 +11,48 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
 public class CountriesRepository {
+    private static final String SAVE_TEMPLATE = "INSERT INTO countries(name) VALUES (?)";
+    private static final String SAVE_BY_ID_TEMPLATE = "INSERT INTO countries(id, name) VALUES (?, ?)";
     private static final String FIND_ALL_TEMPLATE = "SELECT id, name FROM countries";
     private static final String FIND_BY_ID_TEMPLATE = "SELECT id, name FROM countries WHERE id = ?";
-    private static final String SAVE_TEMPLATE = "INSERT INTO countries(name) VALUES (?)";
     private static final String UPDATE_TEMPLATE = "UPDATE countries SET name = ? WHERE id = ?";
     private static final String DELETE_TEMPLATE = "DELETE FROM countries WHERE id = ?";
 
     private Connection connection;
     private final CountryMapper countryMapper;
+
+    public boolean save(@NotNull Country country) {
+        connection = ConnectionFactory.getConnection();
+
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(SAVE_TEMPLATE);
+            preparedStatement.setString(1, country.getName());
+
+            return preparedStatement.executeUpdate() == 1;
+        } catch (SQLException e) {
+            return false;
+        }
+    }
+
+    public void saveById(@NotNull Country country) {
+        connection = ConnectionFactory.getConnection();
+
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(SAVE_BY_ID_TEMPLATE);
+            preparedStatement.setInt(1, country.getId());
+            preparedStatement.setString(2, country.getName());
+
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            throw new DataAccessException(e);
+        }
+    }
 
     public List<Country> findAll() {
         connection = ConnectionFactory.getConnection();
@@ -67,19 +94,6 @@ public class CountriesRepository {
         }
 
         return result;
-    }
-
-    public boolean save(@NotNull Country country) {
-        connection = ConnectionFactory.getConnection();
-
-        try {
-            PreparedStatement preparedStatement = connection.prepareStatement(SAVE_TEMPLATE);
-            preparedStatement.setString(1, country.getName());
-
-            return preparedStatement.executeUpdate() == 1;
-        } catch (SQLException e) {
-            return false;
-        }
     }
 
     public boolean update(int id, @NotNull Country updatedCountry) {

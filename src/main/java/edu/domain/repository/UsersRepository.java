@@ -5,18 +5,19 @@ import edu.domain.model.User;
 import edu.domain.repository.exception.DataAccessException;
 import edu.domain.repository.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
+@Log4j2
 public class UsersRepository {
     private static final String FIND_ALL_TEMPLATE = "SELECT id, name, email, password_hash FROM users";
     private static final String FIND_BY_ID_TEMPLATE = "SELECT id, name, email, password_hash FROM users WHERE id = ?";
@@ -26,6 +27,7 @@ public class UsersRepository {
             WHERE email = ?
             """;
     private static final String SAVE_TEMPLATE = "INSERT INTO users(name, email, password_hash) VALUES (?, ?, ?)";
+    private static final String SAVE_BY_ID_TEMPLATE = "INSERT INTO users(id, name, email, password_hash) VALUES (?, ?, ?, ?)";
     private static final String UPDATE_TEMPLATE = """
             UPDATE users
             SET name = ?,
@@ -37,6 +39,39 @@ public class UsersRepository {
 
     private Connection connection;
     private final UserMapper userMapper;
+
+    public boolean save(@NotNull User user) {
+        connection = ConnectionFactory.getConnection();
+
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(SAVE_TEMPLATE);
+            preparedStatement.setString(1, user.getName());
+            preparedStatement.setString(2, user.getEmail());
+            preparedStatement.setString(3, user.getPasswordHash());
+
+            return preparedStatement.executeUpdate() == 1;
+        } catch (SQLException e) {
+            log.error(e.getMessage());
+            return false;
+        }
+    }
+
+    public boolean saveById(@NotNull User user) {
+        connection = ConnectionFactory.getConnection();
+
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(SAVE_BY_ID_TEMPLATE);
+            preparedStatement.setInt(1, user.getId());
+            preparedStatement.setString(2, user.getName());
+            preparedStatement.setString(3, user.getEmail());
+            preparedStatement.setString(4, user.getPasswordHash());
+
+            return preparedStatement.executeUpdate() == 1;
+        } catch (SQLException e) {
+            log.error(e.getMessage());
+            return false;
+        }
+    }
 
     public List<User> findAll() {
         connection = ConnectionFactory.getConnection();
@@ -52,6 +87,7 @@ public class UsersRepository {
                 users.add(user);
             }
         } catch (SQLException e) {
+            log.error(e.getMessage());
             throw new DataAccessException(e);
         }
 
@@ -74,6 +110,7 @@ public class UsersRepository {
                 result = Optional.of(user);
             }
         } catch (SQLException e) {
+            log.error(e.getMessage());
             throw new DataAccessException(e);
         }
 
@@ -96,25 +133,11 @@ public class UsersRepository {
                 result = Optional.of(user);
             }
         } catch (SQLException e) {
+            log.error(e.getMessage());
             throw new DataAccessException(e);
         }
 
         return result;
-    }
-
-    public boolean save(@NotNull User user) {
-        connection = ConnectionFactory.getConnection();
-
-        try {
-            PreparedStatement preparedStatement = connection.prepareStatement(SAVE_TEMPLATE);
-            preparedStatement.setString(1, user.getName());
-            preparedStatement.setString(2, user.getEmail());
-            preparedStatement.setString(3, user.getPasswordHash());
-
-            return preparedStatement.executeUpdate() == 1;
-        } catch (SQLException e) {
-            return false;
-        }
     }
 
     public boolean update(int id, @NotNull User updatedUser) {
@@ -130,6 +153,7 @@ public class UsersRepository {
 
             return preparedStatement.executeUpdate() == 1;
         } catch (SQLException e) {
+            log.error(e.getMessage());
             throw new DataAccessException(e);
         }
     }
@@ -143,6 +167,7 @@ public class UsersRepository {
 
             return preparedStatement.executeUpdate() == 1;
         } catch (SQLException e) {
+            log.error(e.getMessage());
             throw new DataAccessException(e);
         }
     }
